@@ -6,10 +6,10 @@
  * data show is derived from this file via src/lib/pricing/calculate.ts.
  * UI components must never hard-code prices, discounts or savings.
  *
- * ALL VALUES BELOW ARE EDITABLE DESIGN PLACEHOLDERS — confirm before launch.
- * Essential uses the placeholder ladder from the brief ($99 / $84 / $74 / $64).
- * Professional values are additional placeholders following the same discount
- * ladder and must be confirmed by NESJA commercial leadership.
+ * Values are published on the live site. Essential uses the ladder from the
+ * original brief ($99 / $84 / $74 / $64). Professional values follow the same
+ * discount ladder and are awaiting confirmation by NESJA commercial
+ * leadership — confirm or correct them here.
  */
 import type { CurrencyCode } from "./locales";
 
@@ -83,7 +83,7 @@ export const pricingConfig = {
    * Example: [{ minSeats: 500, discount: 0.05 }, { minSeats: 1000, discount: 0.1 }]
    */
   volumeTiers: [] as VolumeTier[],
-  /** Publish prices in structured data (schema.org Offer). Keep false while placeholders. */
+  /** Publish prices in structured data (schema.org Offer). Keep false until all prices are confirmed. */
   publishStructuredOffers: false,
 
   terms: [
@@ -110,7 +110,7 @@ export const pricingConfig = {
       name: "Professional",
       tagline: "Advanced commercial operations",
       description: "Adds quoting, contracts and customer success so the full commercial lifecycle runs on NESJA.",
-      // PLACEHOLDER — confirm with NESJA commercial leadership.
+      // Awaiting confirmation by NESJA commercial leadership.
       priceBook: { USD: { monthly: 139, "12m": 118, "24m": 104, "36m": 90 } },
       includedModules: ["pipeline", "accounts", "engage", "intelligence", "quote", "contracts", "success", "ai"],
       highlights: ["Everything in Essential", "CPQ, BOQ and bundle configuration", "Contract lifecycle and obligations", "Customer success and renewals", "Forecasting and NESJA AI"],
@@ -132,7 +132,7 @@ export const pricingConfig = {
     },
   ] as Edition[],
 
-  /** Future pricing components: base licence + modules + integrations + implementation + consumption. */
+  /** Pricing components beyond the licence: implementation, integrations and consumption. */
   addOns: [
     { id: "implementation", name: "Implementation services", description: "Configuration, data migration and enablement, scoped to your organisation.", model: "quoted", price: null, status: "available", category: "implementation" },
     { id: "integrations", name: "Integration packs", description: "Connections to ERP, finance, identity and communication platforms.", model: "quoted", price: null, status: "planned", category: "integration" },
@@ -193,5 +193,6 @@ export const pricingFaqs = [
   { q: "Is the monthly price a commitment?", a: "No. Monthly pricing carries no long-term commitment. Prices for 12, 24 and 36-month terms are shown as a per-user monthly equivalent of a fixed-term agreement." },
   { q: "What is not included in the licence price?", a: "Implementation services, integration packs and usage-based consumption such as messaging and additional AI capacity are scoped separately. We quote these transparently before you commit." },
   { q: "Can we start with some teams and expand?", a: "Yes. Many organisations start with one or two teams. Your agreement can be expanded as more teams move onto NESJA, and your account team will confirm how additional users are priced." },
-  { q: "Do you support local currencies?", a: "Pricing is shown in US dollars today. Regional price books for OMR, AED, SAR, GBP and EUR are being prepared. Your account team can quote in your currency." },
+  { q: "Do you support local currencies?", a: "Pricing is displayed in USD. Contact NESJA for applicable regional or enterprise commercial terms." },
+  { q: "Can we receive a formal proposal?", a: "Yes. Request a proposal with your edition, number of users and preferred term, and NESJA will prepare a commercial proposal for your organisation." },
 ];

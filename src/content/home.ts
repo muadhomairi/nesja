@@ -6,6 +6,7 @@ export const hero = {
   eyebrow: "The Commercial Operating System",
   headline: ["Your commercial operation.", "One intelligent system."],
   body: "NESJA.OS connects sales, marketing, quoting, contracts, communication, customer success and intelligence into one Commercial Operating System.",
+  supporting: "See how NESJA can work across your commercial organisation.",
   streams: ["Marketing", "Sales", "Pipeline", "Revenue", "Contracts", "Communication", "Customer Success", "Intelligence"],
   outcome: "Growth",
 };

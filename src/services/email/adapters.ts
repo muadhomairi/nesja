@@ -1,7 +1,7 @@
 /**
  * Transactional email adapters. Select with EMAIL_PROVIDER:
  *   console (default, development) | resend | sendgrid | microsoft-graph
- * All providers send from EMAIL_FROM (e.g. "NESJA <hello@nesja.com>").
+ * All providers send from EMAIL_FROM (e.g. "NESJA <hello@nesja.ai>").
  */
 import { requireEnv, optionalEnv } from "@/lib/server/env";
 import { graph } from "../microsoft-graph";

@@ -66,7 +66,7 @@ export const resources: Resource[] = [
       { type: "quote", text: "One commercial fabric. Infinite intelligence." },
       { type: "h2", text: "VII. What we believe" },
       { type: "list", items: ["Commercial work should be designed as one system, not assembled from many.", "Every person who serves a customer deserves the whole context of that customer.", "Commercial policy should be built into the work, not policed after it.", "Leaders should decide from one version of the truth.", "Intelligence belongs inside the work, not beside it."] },
-      { type: "p", text: "Connect. Orchestrate. Grow. That is the work of a Commercial Operating System, and it is what we are building with NESJA.OS." },
+      { type: "p", text: "Connect. Orchestrate. Grow. That is the work of a Commercial Operating System, and it is what NESJA.OS does." },
     ],
   },
   {

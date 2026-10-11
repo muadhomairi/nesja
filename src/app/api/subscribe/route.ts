@@ -1,5 +1,5 @@
 import { subscribeSchema } from "@/lib/validation";
-import { json, parseBody, requestMeta } from "@/lib/server/http";
+import { json, leadSource, parseBody, requestMeta } from "@/lib/server/http";
 import { getLeadService } from "@/services/leads";
 
 export async function POST(req: Request) {
@@ -8,7 +8,7 @@ export async function POST(req: Request) {
   const d = parsed.data;
   if (d.website) return json({ ok: true });
   try {
-    await getLeadService().submit({ type: "subscription", contact: { email: d.email }, details: { location: d.location }, attribution: d.attribution, meta: requestMeta(req) });
+    await getLeadService().submit({ type: "subscription", contact: { email: d.email }, details: { location: d.location }, attribution: d.attribution, source: leadSource(req, d.submission), meta: requestMeta(req) });
     return json({ ok: true });
   } catch (e) {
     console.error("[subscribe] failed", e);

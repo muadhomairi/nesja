@@ -1,23 +1,44 @@
 import type { Metadata } from "next";
-import { integrations, integrationStatusLabel } from "@/config/integrations";
+import { integrations, integrationStatusLabel, integrationStatusHelp, type IntegrationStatus } from "@/config/integrations";
+import { ctas } from "@/config/ctas";
 import { PageHero, Section, Badge } from "@/components/ui/Section";
 import { ButtonLink } from "@/components/ui/Button";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
   title: "Integrations",
-  description: "NESJA works with the systems your business already runs on: productivity suites, messaging, ERP and finance, contact centre, payments and BI.",
+  description: "Connect NESJA to your commercial environment. Integration requirements are scoped around the systems, workflows and data exchanges your deployment needs.",
   path: "/integrations",
 });
+
+const tone = (s: IntegrationStatus) => (s === "available" ? "teal" : s === "roadmap" ? "neutral" : "signal") as "teal" | "signal" | "neutral";
+const statusOrder: IntegrationStatus[] = ["available", "configurable", "custom", "roadmap"];
 
 export default function IntegrationsPage() {
   const categories = [...new Set(integrations.map((i) => i.category))];
   return (
     <>
-      <PageHero eyebrow="Integrations" title="NESJA works with the systems your business already runs on." intro="NESJA is the commercial operating environment. Your ERP, productivity suite and communication platforms stay where they are, and connect to it.">
-        <ButtonLink href="/contact?topic=integrations" size="lg" variant="secondary">Discuss an integration</ButtonLink>
+      <PageHero eyebrow="Integrations" title="Connect NESJA to your commercial environment." intro="Integration requirements vary by organisation. NESJA can be scoped around the systems, workflows and data exchanges required for your deployment.">
+        <ButtonLink href={`${ctas.discussIntegration.href}&from=integrations-hero`} size="lg" arrow track={{ event: "contact_sales_clicked", props: { location: "integrations-hero" } }}>{ctas.discussIntegration.label}</ButtonLink>
       </PageHero>
-      <Section id="catalogue" eyebrow="Ecosystem" title="Integration roadmap." intro="Statuses reflect current availability. Third-party names are trademarks of their owners and are shown for identification only.">
+      <Section id="approach" eyebrow="How we scope integrations" title="Built around your systems, not ours.">
+        <ul className="grid gap-4 md:grid-cols-3">
+          {[
+            ["Map your environment", "We identify the ERP, productivity, communication and data platforms your commercial teams rely on."],
+            ["Agree the data exchanges", "We define which records and events move between NESJA and each system, and in which direction."],
+            ["Plan the approach", "Each integration is scoped as part of your deployment, with its status agreed in your proposal."],
+          ].map(([t, b]) => <li key={t} className="surface p-7"><h3 className="font-semibold text-cloud">{t}</h3><p className="mt-2 text-sm leading-relaxed text-mist">{b}</p></li>)}
+        </ul>
+      </Section>
+      <Section id="catalogue" className="border-t border-white/[0.06]" eyebrow="Ecosystem" title="Integration status." intro="Every status on this page reflects what is true today. Third-party names are trademarks of their owners and are shown for identification only.">
+        <dl className="mb-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {statusOrder.map((s) => (
+            <div key={s} className="rounded-2xl border border-white/[0.07] p-4">
+              <dt><Badge tone={tone(s)}>{integrationStatusLabel[s]}</Badge></dt>
+              <dd className="mt-2 text-sm text-mist">{integrationStatusHelp[s]}</dd>
+            </div>
+          ))}
+        </dl>
         <div className="space-y-10">
           {categories.map((c) => (
             <div key={c}>
@@ -26,7 +47,7 @@ export default function IntegrationsPage() {
                 {integrations.filter((i) => i.category === c).map((i) => (
                   <li key={i.id} className="flex items-start justify-between gap-3 rounded-2xl border border-white/[0.07] bg-midnight-800/40 p-5">
                     <div><p className="font-semibold text-cloud">{i.name}</p><p className="mt-1 text-sm text-mist">{i.description}</p></div>
-                    <Badge tone={i.status === "available" ? "teal" : "neutral"}>{integrationStatusLabel[i.status]}</Badge>
+                    <Badge tone={tone(i.status)}>{integrationStatusLabel[i.status]}</Badge>
                   </li>
                 ))}
               </ul>
@@ -34,8 +55,8 @@ export default function IntegrationsPage() {
           ))}
         </div>
       </Section>
-      <Section id="marketplace" className="border-t border-white/[0.06]" eyebrow="Long term" title="NESJA Marketplace." intro="A future home for certified integrations, extensions and partner solutions built on NESJA.OS.">
-        <ButtonLink href="/marketplace" variant="secondary" arrow>About the Marketplace</ButtonLink>
+      <Section id="discuss" className="border-t border-white/[0.06]" eyebrow="Your requirements" title="Discuss your integration requirements." intro="Tell us which systems your commercial organisation relies on and we'll assess the appropriate integration approach.">
+        <ButtonLink href={`${ctas.discussIntegration.href}&from=integrations-footer`} size="lg" arrow track={{ event: "contact_sales_clicked", props: { location: "integrations-footer" } }}>{ctas.discussIntegration.label}</ButtonLink>
       </Section>
     </>
   );

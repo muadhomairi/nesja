@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   title: { default: `${siteConfig.name} — ${siteConfig.category}`, template: `%s | ${siteConfig.name}` },
   description: siteConfig.description,
   applicationName: siteConfig.name,
-  keywords: ["Commercial Operating System", "Commercial Management Software", "Revenue Operations Platform", "Sales Management Platform", "CPQ Software", "Contract Management", "Customer Success Platform", "Commercial Intelligence", "AI Sales Platform"],
+  keywords: ["Commercial Operating System", "Commercial Management Software", "Commercial Intelligence", "Pipeline Management", "CPQ", "CPQ Software", "Contract Management", "Customer Success", "Revenue Operations", "AI Commercial Platform"],
   openGraph: { siteName: siteConfig.name, type: "website", locale: "en_GB" },
   twitter: { card: "summary_large_image" },
   icons: { icon: "/icon.svg" },

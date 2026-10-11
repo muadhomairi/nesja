@@ -10,10 +10,11 @@ import { buildMetadata, faqJsonLd } from "@/lib/seo";
 import { pricingConfig, pricingFaqs } from "@/config/pricing";
 import { siteConfig } from "@/config/site";
 import { startingPrice } from "@/lib/pricing/calculate";
+import { ctas } from "@/config/ctas";
 
 export const metadata: Metadata = buildMetadata({
   title: "Pricing",
-  description: "Transparent per-user pricing for the NESJA.OS Commercial Operating System. Longer partnerships, better economics. Calculate your investment.",
+  description: "Transparent per-user pricing for NESJA.OS, the Commercial Operating System for pipeline management, CPQ, contract management and customer success. Calculate your investment, book a demo or request a proposal.",
   path: "/pricing",
 });
 
@@ -44,13 +45,13 @@ export default function PricingPage() {
       <Section id="compare" className="border-t border-white/[0.06]" align="center" eyebrow="Compare" title="What each edition includes.">
         <ComparisonTable />
       </Section>
-      <Section id="addons" className="border-t border-white/[0.06]" eyebrow="Beyond the licence" title="Transparent about everything else." intro="Your licence covers the platform. These are scoped separately, and quoted before you commit.">
+      <Section id="addons" className="border-t border-white/[0.06]" eyebrow="Beyond the licence" title="Transparent about everything else." intro="Your licence covers the platform. Implementation and other services are scoped to your requirements and included in your proposal before you commit.">
         <AddOns />
       </Section>
       <Section id="faq" className="border-t border-white/[0.06]" eyebrow="Questions" title="Pricing, explained.">
         <div className="max-w-3xl"><Faq items={pricingFaqs} /></div>
       </Section>
-      <FinalCta location="pricing-final" headline={["See what NESJA would cost your organisation,", "and what it would change."]} />
+      <FinalCta location="pricing-final" headline={["See what NESJA costs for your organisation,", "and what it changes."]} supporting="Book a demo, or request a proposal for your edition, users and term." secondary={ctas.requestProposal} />
       <JsonLd data={faqJsonLd(pricingFaqs)} />
       {product && <JsonLd data={product} />}
     </>

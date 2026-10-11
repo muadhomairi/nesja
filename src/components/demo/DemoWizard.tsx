@@ -8,7 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { demoContactSchema, demoInterests, emailField, isFreeEmail, teamSizes, fieldErrors } from "@/lib/validation";
 import { postJson } from "@/lib/api-client";
-import { getAttribution } from "@/lib/attribution";
+import { getAttribution, submissionContext } from "@/lib/attribution";
 import { track } from "@/lib/analytics";
 import { buildIcs } from "@/lib/ics";
 import { siteConfig } from "@/config/site";
@@ -30,7 +30,7 @@ const fmt = (iso: string, tz: string, o: Intl.DateTimeFormatOptions) => new Intl
 
 export function DemoWizard() {
   const [step, setStep] = useState(0);
-  const [done, setDone] = useState<null | { booking: Booking; emailSent: boolean; emailProvider: string }>(null);
+  const [done, setDone] = useState<null | { booking: Booking; requested: boolean; emailSent: boolean }>(null);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
@@ -42,7 +42,7 @@ export function DemoWizard() {
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [tz, setTz] = useState("UTC");
-  const [slots, setSlots] = useState<{ status: "idle" | "loading" | "ready" | "error"; items: Slot[]; error?: string }>({ status: "idle", items: [] });
+  const [slots, setSlots] = useState<{ status: "idle" | "loading" | "ready" | "error"; items: Slot[]; error?: string; provider?: string }>({ status: "idle", items: [] });
   const [day, setDay] = useState("");
   const [slot, setSlot] = useState<Slot | null>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -66,7 +66,7 @@ export function DemoWizard() {
       const res = await fetch(`/api/scheduling/availability?days=14&timezone=${encodeURIComponent(zone)}`);
       const data = await res.json();
       if (!data.ok) throw new Error(data.error);
-      setSlots({ status: "ready", items: data.slots });
+      setSlots({ status: "ready", items: data.slots, provider: data.provider });
     } catch (e) {
       setSlots({ status: "error", items: [], error: e instanceof Error && e.message ? e.message : "We couldn't load availability." });
     }
@@ -107,12 +107,13 @@ export function DemoWizard() {
   const book = async () => {
     if (!slot) return setErrors({ slot: "Choose a time that works for you." });
     setSubmitting(true); setFormError("");
-    const res = await postJson<{ booking: Booking; emailSent: boolean; emailProvider: string }>("/api/scheduling/book", {
-      email, name, company, teamSize, interest, slotId: slot.id, start: slot.start, end: slot.end, timezone: tz, context: context || undefined, attribution: getAttribution(), website: hp,
+    const res = await postJson<{ booking: Booking; requested: boolean; emailSent: boolean }>("/api/scheduling/book", {
+      email, name, company, teamSize, interest, slotId: slot.id, start: slot.start, end: slot.end, timezone: tz, context: context || undefined, attribution: getAttribution(),
+      submission: submissionContext(context ? "book-demo:pricing" : "book-demo"), website: hp,
     });
     setSubmitting(false);
     if (res.ok) {
-      setDone({ booking: res.booking, emailSent: res.emailSent, emailProvider: res.emailProvider });
+      setDone({ booking: res.booking, requested: res.requested, emailSent: res.emailSent });
       track("demo_completed", { teamSize, interest, provider: res.booking.provider });
       return;
     }
@@ -121,7 +122,10 @@ export function DemoWizard() {
     setFormError(res.error);
   };
 
-  if (done) return <Confirmation {...done} name={name} email={email} headingRef={headingRef} />;
+  if (done) return <Confirmation {...done} name={name} email={email} interest={interest} headingRef={headingRef} />;
+
+  // Without a connected calendar, the visitor proposes a time and the team confirms it.
+  const requestMode = slots.provider === "mock";
 
   const timezones: string[] = typeof Intl.supportedValuesOf === "function" ? Intl.supportedValuesOf("timeZone") : [tz];
 
@@ -164,7 +168,7 @@ export function DemoWizard() {
           </StepShell>
         )}
         {step === 4 && (
-          <StepShell title="Choose a time." sub="30 minutes with a NESJA specialist." headingRef={headingRef}>
+          <StepShell title={requestMode ? "Choose a preferred time." : "Choose a time."} sub={requestMode ? "30 minutes with a NESJA specialist. We'll confirm the time with you by email." : "30 minutes with a NESJA specialist."} headingRef={headingRef}>
             <div className="mb-4">
               <label htmlFor="tz" className="mb-1.5 block text-xs font-medium text-mist">Times shown in</label>
               <select id="tz" value={tz} onChange={(e) => { setTz(e.target.value); setSlot(null); }} className="h-10 w-full rounded-xl border border-white/[0.12] bg-midnight-900/60 px-3 text-sm text-cloud">
@@ -210,9 +214,9 @@ export function DemoWizard() {
 
         <div className="mt-8 flex items-center justify-between gap-3">
           {step > 0 ? <Button type="button" variant="ghost" onClick={() => { setErrors({}); setFormError(""); setStep(step - 1); }}><Icon name="arrowLeft" className="h-4 w-4 rtl:-scale-x-100" /> Back</Button> : <span />}
-          <Button type="submit" size="lg" loading={submitting} arrow={step < 4}>{step < 4 ? "Continue" : submitting ? "Booking…" : "Confirm booking"}</Button>
+          <Button type="submit" size="lg" loading={submitting} arrow={step < 4}>{step < 4 ? "Continue" : submitting ? "Sending…" : requestMode ? "Request demo" : "Confirm booking"}</Button>
         </div>
-        {step === 0 && <p className="mt-6 text-xs leading-relaxed text-mist">By continuing you agree to our <Link href="/privacy" className="underline hover:text-cloud">Privacy Policy</Link>. We use your details only to arrange and prepare your demo.</p>}
+        {step === 0 && <p className="mt-6 text-xs leading-relaxed text-mist">By continuing you agree to our <Link href="/privacy" className="underline hover:text-cloud">Privacy Policy</Link>. We use your details to arrange and prepare your demonstration.</p>}
       </form>
     </div>
   );
@@ -246,29 +250,32 @@ function ChoiceGrid({ name, options, value, onChange, error, cols }: { name: str
   );
 }
 
-function Confirmation({ booking, emailSent, emailProvider, name, email, headingRef }: { booking: Booking; emailSent: boolean; emailProvider: string; name: string; email: string; headingRef: React.RefObject<HTMLHeadingElement | null> }) {
+function Confirmation({ booking, requested, emailSent, name, email, interest, headingRef }: { booking: Booking; requested: boolean; emailSent: boolean; name: string; email: string; interest: string; headingRef: React.RefObject<HTMLHeadingElement | null> }) {
   const tz = booking.timezone;
   const ics = buildIcs({ uid: booking.id, start: booking.start, end: booking.end, title: "NESJA.OS demo", description: `NESJA.OS demo for ${name}.${booking.joinUrl ? ` Join: ${booking.joinUrl}` : ""}`, location: booking.meetingMethod, url: booking.joinUrl });
   const icsHref = `data:text/calendar;charset=utf-8,${encodeURIComponent(ics)}`;
   const gStamp = (iso: string) => iso.replace(/[-:]/g, "").replace(/\.\d{3}/, "");
   const gcal = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent("NESJA.OS demo")}&dates=${gStamp(booking.start)}/${gStamp(booking.end)}&details=${encodeURIComponent("Your NESJA.OS demo.")}`;
-  const devMode = booking.provider === "mock" || emailProvider === "console";
   const calendarStatus =
-    booking.calendarStatus === "invite_sent" ? `Calendar invitation sent to ${email}`
-      : devMode ? "Development mode: no invitation was sent. Use the buttons below to add it to your calendar."
+    booking.calendarStatus === "invite_sent" ? `Calendar invitation sent to ${email}.`
       : emailSent ? `Confirmation sent to ${email}. Your calendar invitation will follow.`
       : "Add this meeting to your calendar using the buttons below.";
+  const first = name.split(" ")[0];
 
   return (
     <div className="surface overflow-hidden bg-midnight-800/80" role="status">
       <div className="px-6 py-8 md:px-10 md:py-10">
         <span className="flex h-12 w-12 items-center justify-center rounded-full bg-teal/15 text-teal"><Icon name="check" className="h-6 w-6" /></span>
-        <h2 ref={headingRef} tabIndex={-1} className="mt-6 text-display-md text-cloud outline-none">You&apos;re booked.</h2>
-        <p className="mt-2 text-mist">Thanks, {name.split(" ")[0]}. We look forward to meeting you.</p>
+        <h2 ref={headingRef} tabIndex={-1} className="mt-6 text-display-md text-cloud outline-none">{requested ? "Your demo request has been received." : "You\u2019re booked."}</h2>
+        <p className="mt-2 text-mist">
+          {requested
+            ? `Thank you, ${first}. A member of the NESJA team will review your request and confirm your demonstration by email at ${email}.`
+            : `Thank you, ${first}. We look forward to meeting you.`}
+        </p>
         <dl className="mt-8 grid gap-4 sm:grid-cols-2">
           {[
-            ["calendar", "Date", fmt(booking.start, tz, { weekday: "long", day: "numeric", month: "long", year: "numeric" })],
-            ["clock", "Time", `${fmt(booking.start, tz, { hour: "2-digit", minute: "2-digit" })} – ${fmt(booking.end, tz, { hour: "2-digit", minute: "2-digit" })}`],
+            ["calendar", requested ? "Preferred date" : "Date", fmt(booking.start, tz, { weekday: "long", day: "numeric", month: "long", year: "numeric" })],
+            ["clock", requested ? "Preferred time" : "Time", `${fmt(booking.start, tz, { hour: "2-digit", minute: "2-digit" })} – ${fmt(booking.end, tz, { hour: "2-digit", minute: "2-digit" })}`],
             ["globe", "Timezone", tz.replace(/_/g, " ")],
             ["video", "Meeting method", booking.meetingMethod],
           ].map(([icon, k, v]) => (
@@ -278,20 +285,29 @@ function Confirmation({ booking, emailSent, emailProvider, name, email, headingR
             </div>
           ))}
         </dl>
-        <div className="mt-4 rounded-xl border border-white/[0.07] bg-midnight-900/40 p-4">
-          <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.12em] text-mist"><Icon name="mail" className="h-4 w-4 text-teal" />Calendar status</p>
-          <p className="mt-1.5 text-sm text-silver">{calendarStatus}</p>
-          {booking.joinUrl && <a href={booking.joinUrl} className="mt-2 inline-flex text-sm font-semibold text-teal hover:underline" target="_blank" rel="noopener noreferrer">Join link</a>}
-        </div>
-        <div className="mt-6 flex flex-wrap gap-2">
-          <a href={icsHref} download="nesja-demo.ics" className="inline-flex h-10 items-center gap-2 rounded-full border border-white/15 px-4 text-sm font-semibold text-cloud hover:border-white/30"><Icon name="download" className="h-4 w-4" /> Add to calendar (.ics)</a>
-          <a href={gcal} target="_blank" rel="noopener noreferrer" className="inline-flex h-10 items-center gap-2 rounded-full border border-white/15 px-4 text-sm font-semibold text-cloud hover:border-white/30"><Icon name="calendar" className="h-4 w-4" /> Google Calendar</a>
-        </div>
+        {requested ? (
+          <div className="mt-4 rounded-xl border border-white/[0.07] bg-midnight-900/40 p-4">
+            <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.12em] text-mist"><Icon name="mail" className="h-4 w-4 text-teal" />Next step</p>
+            <p className="mt-1.5 text-sm text-silver">We&apos;ll confirm this time, or suggest an alternative, and send a calendar invitation. Your demonstration will focus on {interest && interest !== "Everything" ? interest.toLowerCase() : "the full commercial lifecycle"}, your use cases and your deployment requirements.</p>
+          </div>
+        ) : (
+          <>
+            <div className="mt-4 rounded-xl border border-white/[0.07] bg-midnight-900/40 p-4">
+              <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.12em] text-mist"><Icon name="mail" className="h-4 w-4 text-teal" />Calendar status</p>
+              <p className="mt-1.5 text-sm text-silver">{calendarStatus}</p>
+              {booking.joinUrl && <a href={booking.joinUrl} className="mt-2 inline-flex text-sm font-semibold text-teal hover:underline" target="_blank" rel="noopener noreferrer">Join link</a>}
+            </div>
+            <div className="mt-6 flex flex-wrap gap-2">
+              <a href={icsHref} download="nesja-demo.ics" className="inline-flex h-10 items-center gap-2 rounded-full border border-white/15 px-4 text-sm font-semibold text-cloud hover:border-white/30"><Icon name="download" className="h-4 w-4" /> Add to calendar (.ics)</a>
+              <a href={gcal} target="_blank" rel="noopener noreferrer" className="inline-flex h-10 items-center gap-2 rounded-full border border-white/15 px-4 text-sm font-semibold text-cloud hover:border-white/30"><Icon name="calendar" className="h-4 w-4" /> Google Calendar</a>
+            </div>
+          </>
+        )}
       </div>
       <div className="border-t border-white/[0.06] bg-midnight-900/40 px-6 py-6 md:px-10">
         {siteConfig.overviewVideoUrl ? (
           <>
-            <p className="font-semibold text-cloud">Watch a 2-minute NESJA overview while you wait.</p>
+            <p className="font-semibold text-cloud">Before we meet: watch a 2-minute NESJA overview.</p>
             <div className="mt-4 aspect-video overflow-hidden rounded-xl border border-white/10">
               {siteConfig.overviewVideoUrl.endsWith(".mp4")
                 ? <video src={siteConfig.overviewVideoUrl} controls className="h-full w-full" />
@@ -300,7 +316,7 @@ function Confirmation({ booking, emailSent, emailProvider, name, email, headingR
           </>
         ) : (
           <Link href="/resources/commercial-operating-system-manifesto" className="group flex items-center justify-between gap-4">
-            <span><span className="block font-semibold text-cloud">While you wait: read the Commercial OS Manifesto.</span><span className="text-sm text-mist">Nine minutes on why commercial organisations should run as one system.</span></span>
+            <span><span className="block font-semibold text-cloud">Before we meet: read the Commercial OS Manifesto.</span><span className="text-sm text-mist">Nine minutes on why commercial organisations should run as one system.</span></span>
             <Icon name="arrowRight" className="h-5 w-5 shrink-0 text-teal transition-transform group-hover:translate-x-1 rtl:-scale-x-100" />
           </Link>
         )}

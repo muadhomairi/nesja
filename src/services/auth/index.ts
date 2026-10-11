@@ -3,7 +3,7 @@
  * the user to the NESJA application's identity flow.
  *
  * AUTH_PROVIDER:
- *   none (default)  → sign-in explains the app isn't connected in this environment
+ *   none (default)  → sign-in points customers to their organisation's NESJA environment
  *   nesja-app       → redirect to {NEXT_PUBLIC_APP_URL}{AUTH_LOGIN_PATH}?login_hint=email
  *   oidc            → build an OpenID Connect authorization URL (OIDC_ISSUER, OIDC_CLIENT_ID, OIDC_REDIRECT_URI)
  * ▶ REPLACE "none" once the NESJA application URL is live.
@@ -36,5 +36,5 @@ export async function beginSignIn(email: string): Promise<SignInResult> {
     return { status: "redirect", url: url.toString() };
   }
 
-  return { status: "not_configured", message: "Sign-in to the NESJA application isn't connected in this environment yet. If you're a customer, use the sign-in link from your NESJA administrator." };
+  return { status: "not_configured", message: "NESJA customers sign in through their organisation's NESJA environment. Use the sign-in link provided by your NESJA administrator, or contact us and we'll help." };
 }

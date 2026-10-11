@@ -4,6 +4,11 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { mainNav, type NavItem } from "@/config/navigation";
 import { ctas } from "@/config/ctas";
+import { siteConfig } from "@/config/site";
+
+// "Sign In" appears only once the NESJA application URL is configured;
+// until then the secondary header action is Talk to Sales (no dead links).
+const secondaryCta = siteConfig.appUrl ? ctas.signIn : ctas.talkToSales;
 import { Logo } from "@/components/ui/Logo";
 import { ButtonLink } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
@@ -97,16 +102,16 @@ export function Header() {
           </ul>
         </nav>
 
-        <div className="flex items-center gap-2">
-          <Link href={ctas.signIn.href} className="hidden rounded-full px-4 py-2 text-[0.9375rem] font-medium text-silver transition-colors hover:text-cloud sm:inline-flex">
-            {ctas.signIn.label}
+        <div className="flex items-center gap-1 min-[360px]:gap-2">
+          <Link href={secondaryCta.href} className="hidden rounded-full px-4 py-2 text-[0.9375rem] font-medium text-silver transition-colors hover:text-cloud sm:inline-flex">
+            {secondaryCta.label}
           </Link>
-          <ButtonLink href={ctas.bookDemo.href} size="sm" className="h-10 px-4 sm:px-5" track={{ event: "hero_demo_clicked", props: { location: "header" } }}>
+          <ButtonLink href={ctas.bookDemo.href} size="sm" className="h-10 whitespace-nowrap px-3 min-[360px]:px-4 sm:px-5" track={{ event: "hero_demo_clicked", props: { location: "header" } }}>
             {ctas.bookDemo.label}
           </ButtonLink>
           <button
             type="button"
-            className="-me-2 inline-flex h-11 w-11 items-center justify-center rounded-full text-cloud hover:bg-white/5 lg:hidden"
+            className="-me-2 inline-flex h-11 w-10 items-center min-[360px]:w-11 justify-center rounded-full text-cloud hover:bg-white/5 lg:hidden"
             aria-expanded={mobileOpen}
             aria-controls="mobile-nav"
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
@@ -215,7 +220,7 @@ function MobileNav() {
         </ul>
         <div className="mt-auto grid gap-3 pt-8">
           <ButtonLink href={ctas.bookDemo.href} size="lg" arrow track={{ event: "hero_demo_clicked", props: { location: "mobile-nav" } }}>{ctas.bookDemo.label}</ButtonLink>
-          <ButtonLink href={ctas.signIn.href} size="lg" variant="secondary">{ctas.signIn.label}</ButtonLink>
+          <ButtonLink href={secondaryCta.href} size="lg" variant="secondary">{secondaryCta.label}</ButtonLink>
         </div>
       </nav>
     </div>

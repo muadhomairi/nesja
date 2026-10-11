@@ -11,8 +11,8 @@ export const hubspotLeadAdapter: LeadAdapter = {
     const [firstname, ...rest] = (lead.contact.name ?? "").split(" ");
     const fields = Object.entries({
       email: lead.contact.email, firstname, lastname: rest.join(" "), company: lead.contact.company, jobtitle: lead.contact.role,
-      country: lead.contact.country, nesja_lead_type: lead.type, ...lead.details,
-      utm_source: lead.attribution?.lastTouch?.source, utm_medium: lead.attribution?.lastTouch?.medium, utm_campaign: lead.attribution?.lastTouch?.campaign,
+      country: lead.contact.country, nesja_lead_type: lead.type, nesja_enquiry_category: lead.category, nesja_source_page: lead.source?.page, nesja_form_context: lead.source?.formContext, ...lead.details,
+      utm_source: lead.attribution?.lastTouch?.source, utm_medium: lead.attribution?.lastTouch?.medium, utm_campaign: lead.attribution?.lastTouch?.campaign, nesja_referrer: lead.attribution?.lastTouch?.referrer,
     }).filter(([, v]) => v !== undefined && v !== "").map(([name, value]) => ({ name, value: String(value) }));
 
     const res = await fetch(

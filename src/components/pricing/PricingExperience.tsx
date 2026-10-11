@@ -99,7 +99,7 @@ function EditionCards({ term, currency, seats }: { term: TermId; currency: Curre
       {pricingConfig.editions.map((e) => {
         const q = calculateQuote({ editionId: e.id, termId: term, seats: 1, currency });
         const featured = e.recommended;
-        const href = e.cta === "talk-to-sales" ? "/contact?type=enterprise" : `/book-demo?edition=${e.id}&term=${term}&seats=${seats}`;
+        const href = e.cta === "talk-to-sales" ? "/contact?type=enterprise&from=pricing-enterprise" : `/book-demo?edition=${e.id}&term=${term}&seats=${seats}`;
         return (
           <article key={e.id} aria-labelledby={`ed-${e.id}`} className={cn("relative flex flex-col rounded-3xl border p-7 transition-colors md:p-8", featured ? "border-teal/45 bg-gradient-to-b from-teal/[0.08] to-midnight-800/60 shadow-glow" : "border-white/[0.08] bg-midnight-800/50 hover:border-white/15")}>
             {featured && <Badge tone="teal" className="absolute -top-3 start-7 bg-midnight">Recommended</Badge>}
@@ -242,7 +242,7 @@ function Calculator({ term, edition, seats, currency, onTerm, onEdition, onSeats
               </select>
             </div>
           ) : (
-            <p className="text-xs text-mist">Prices in {currencies[currency].label} ({currency}), excluding applicable taxes. Regional pricing is available from your account team.</p>
+            <p className="text-xs text-mist">Pricing is displayed in {currency}, excluding applicable taxes. Contact NESJA for applicable regional or enterprise commercial terms.</p>
           )}
         </div>
 
@@ -253,7 +253,7 @@ function Calculator({ term, edition, seats, currency, onTerm, onEdition, onSeats
               <p className="mt-5 text-2xl font-semibold text-cloud">{formatNumber(seats)}+ users</p>
               <p className="mt-3 leading-relaxed text-mist">At this scale we build a tailored Enterprise agreement covering dedicated environments, deployment model, integrations and volume economics.</p>
               <div className="mt-auto pt-8">
-                <ButtonLink href={`/contact?type=enterprise&users=${seats}`} size="lg" className="w-full" arrow track={{ event: "contact_sales_clicked", props: { location: "calculator" } }}>Talk to Sales</ButtonLink>
+                <ButtonLink href={`/contact?type=enterprise&users=${seats}&from=pricing-calculator`} size="lg" className="w-full" arrow track={{ event: "contact_sales_clicked", props: { location: "calculator" } }}>Talk to Sales</ButtonLink>
               </div>
             </div>
           ) : (
@@ -280,7 +280,7 @@ function Calculator({ term, edition, seats, currency, onTerm, onEdition, onSeats
               <p className="mt-4 text-xs text-mist">Includes: {included.join(", ")}</p>
               <div className="mt-auto grid gap-2 pt-8">
                 <ButtonLink href={`/book-demo?edition=${edition}&term=${term}&seats=${seats}`} size="lg" arrow track={{ event: "pricing_cta_clicked", props: { edition, term, seats, cta: "calculator" } }}>Book a Demo</ButtonLink>
-                <ButtonLink href={`/contact?edition=${edition}&term=${term}&users=${seats}`} variant="ghost" track={{ event: "contact_sales_clicked", props: { location: "calculator" } }}>Request a formal proposal</ButtonLink>
+                <ButtonLink href={`/contact?type=proposal&edition=${edition}&term=${term}&users=${seats}&from=pricing-calculator`} variant="ghost" track={{ event: "contact_sales_clicked", props: { location: "calculator", cta: "request-proposal" } }}>Request a Proposal</ButtonLink>
               </div>
             </div>
           )}

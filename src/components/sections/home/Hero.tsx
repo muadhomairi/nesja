@@ -23,6 +23,7 @@ export function Hero() {
             <ButtonLink href={ctas.bookDemo.href} size="lg" arrow track={{ event: "hero_demo_clicked", props: { location: "hero" } }}>{ctas.bookDemo.label}</ButtonLink>
             <ButtonLink href={ctas.explorePlatform.href} size="lg" variant="secondary" track={{ event: "platform_explored", props: { location: "hero" } }}>{ctas.explorePlatform.label}</ButtonLink>
           </div>
+          <p className="mt-5 text-sm text-mist">{hero.supporting}</p>
         </div>
         <div className="animate-fade-up [animation-delay:150ms]">
           <HeroVisual />

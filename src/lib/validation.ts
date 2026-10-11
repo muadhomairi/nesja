@@ -3,6 +3,7 @@
  * by API routes as the authoritative check.
  */
 import { z } from "zod";
+import { enquiryCategories } from "@/config/enquiries";
 
 export const FREE_EMAIL_DOMAINS = ["gmail.com", "googlemail.com", "yahoo.com", "hotmail.com", "outlook.com", "live.com", "icloud.com", "me.com", "aol.com", "proton.me", "protonmail.com", "gmx.com", "mail.com", "yandex.com"];
 export const isFreeEmail = (email: string) => FREE_EMAIL_DOMAINS.includes(email.split("@")[1]?.toLowerCase() ?? "");
@@ -21,6 +22,13 @@ const touch = z.object({
 }).nullable();
 export const attributionSchema = z.object({ firstTouch: touch, lastTouch: touch }).optional();
 
+/** Where on the site the visitor submitted the form, and what led to it. */
+export const submissionContextSchema = z.object({
+  sourcePage: z.string().max(2000),
+  formContext: z.string().max(300),
+  clientTimestamp: z.string().max(40).optional(),
+}).optional();
+
 /** Honeypot: real users never fill this hidden field. */
 const honeypot = z.string().max(0).optional();
 
@@ -35,11 +43,13 @@ export const bookingSchema = demoContactSchema.merge(demoProfileSchema).extend({
   /** Optional context carried from the page the visitor came from (e.g. pricing selection). */
   context: z.string().max(300).optional(),
   attribution: attributionSchema,
+  submission: submissionContextSchema,
   website: honeypot,
 });
 export type BookingInput = z.infer<typeof bookingSchema>;
 
 export const contactSchema = z.object({
+  enquiryType: z.enum(enquiryCategories, { errorMap: () => ({ message: "Choose an enquiry type." }) }).refine((v) => v !== "DEMO", "Choose an enquiry type."),
   name,
   email: emailField,
   company,
@@ -48,13 +58,15 @@ export const contactSchema = z.object({
   enterprise: z.boolean().default(false),
   country: z.string().trim().max(80).optional().or(z.literal("")),
   companySize: z.enum(companySizes).optional().or(z.literal("")),
-  estimatedUsers: z.coerce.number().int().min(0).max(1_000_000).optional().or(z.literal("")),
+  // "" must be matched before coercion, otherwise an empty field is recorded as 0 users.
+  estimatedUsers: z.union([z.literal(""), z.coerce.number().int().min(1, "Enter a number of users.").max(1_000_000)]).optional(),
   attribution: attributionSchema,
+  submission: submissionContextSchema,
   website: honeypot,
 });
 export type ContactInput = z.infer<typeof contactSchema>;
 
-export const subscribeSchema = z.object({ email: emailField, location: z.string().max(60).default("resources"), attribution: attributionSchema, website: honeypot });
+export const subscribeSchema = z.object({ email: emailField, location: z.string().max(60).default("resources"), attribution: attributionSchema, submission: submissionContextSchema, website: honeypot });
 
 export const signInSchema = z.object({ email: emailField });
 

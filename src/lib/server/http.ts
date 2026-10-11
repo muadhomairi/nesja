@@ -23,3 +23,10 @@ export async function parseBody<T>(req: Request, schema: ZodSchema<T>): Promise<
 export function requestMeta(req: Request) {
   return { userAgent: req.headers.get("user-agent") || "", referer: req.headers.get("referer") || "", submittedAt: new Date().toISOString() };
 }
+
+/** Page + form context for a lead. Falls back to the Referer path when the client sent none. */
+export function leadSource(req: Request, submission?: { sourcePage: string; formContext: string }) {
+  let page = submission?.sourcePage;
+  if (!page) { try { const r = new URL(req.headers.get("referer") || ""); page = r.pathname + r.search; } catch { page = undefined; } }
+  return { page, formContext: submission?.formContext };
+}

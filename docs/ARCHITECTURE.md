@@ -98,4 +98,4 @@ Static prerendering for all content pages (57 routes), client JavaScript limited
 
 ## 10. Internationalisation
 
-`<html lang dir>` comes from the locale config, and components use logical properties (`ms-`, `me-`, `ps-`, `pe-`, `start-`, `end-`) with `rtl:` variants for directional icons. To launch Arabic: write Arabic copy (not a mirrored translation), enable `ar` in `config/locales.ts`, move routes under `app/[locale]/`, and add middleware that resolves the locale from the URL prefix. The `ar` UI dictionary is a draft for native review.
+`<html lang dir>` comes from the locale config, and components use logical properties (`ms-`, `me-`, `ps-`, `pe-`, `start-`, `end-`) with `rtl:` variants for directional icons. To enable Arabic: write Arabic copy (not a mirrored translation), enable `ar` in `config/locales.ts`, move routes under `app/[locale]/`, and add middleware that resolves the locale from the URL prefix. The `ar` UI dictionary is a draft for native review.

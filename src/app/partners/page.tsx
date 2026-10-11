@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { FuturePage } from "@/components/sections/FuturePage";
+import { ctas } from "@/config/ctas";
 import { buildMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = buildMetadata({ title: "Partners", description: "The NESJA partner ecosystem for implementation, technology and regional partners.", path: "/partners" });
+export const metadata: Metadata = buildMetadata({ title: "Partners", description: "Partner with NESJA: implementation, technology and regional partnerships around the Commercial Operating System.", path: "/partners" });
 
 export default function PartnersPage() {
-  return <FuturePage eyebrow="Partners" title="Build the commercial future with NESJA." intro="We are preparing a partner programme for organisations that implement, extend and resell the Commercial Operating System."
-    points={[{ t: "Implementation partners", b: "Consultancies delivering NESJA deployments and commercial transformation." }, { t: "Technology partners", b: "Software companies integrating their products with NESJA.OS." }, { t: "Regional partners", b: "Partners bringing NESJA to new markets and languages." }]}
-    cta={{ label: "Register partner interest", href: "/contact?topic=partners" }} />;
+  return <FuturePage eyebrow="Partners" title="Partner with NESJA." intro="NESJA works with organisations that implement, integrate and bring the Commercial Operating System to new markets. Tell us about your organisation and how you'd like to work together."
+    section={{ eyebrow: "Partnership models", title: "Partnerships we discuss.", intro: "Every partnership is agreed individually, around your capabilities and the customers you serve." }}
+    points={[{ t: "Implementation partners", b: "For consultancies delivering commercial transformation and NESJA deployments." }, { t: "Technology partners", b: "For software companies integrating their products with NESJA.OS." }, { t: "Regional partners", b: "For organisations bringing NESJA to new markets and languages." }]}
+    cta={{ label: ctas.discussPartnership.label, href: `${ctas.discussPartnership.href}&from=partners` }} />;
 }

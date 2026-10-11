@@ -13,16 +13,16 @@ export function Footer() {
   return (
     <footer className="relative border-t border-white/[0.06] bg-midnight-900">
       <div className="container py-16 md:py-20">
-        <div className="grid gap-12 lg:grid-cols-[1.3fr_2fr]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-12 lg:grid-cols-[1.3fr_2fr]">
           <div className="max-w-sm">
             <Logo />
             <p className="mt-5 text-[0.9375rem] leading-relaxed text-mist">{brandStatements.primary}</p>
             <div className="mt-8">
-              <p className="mb-3 text-sm font-semibold text-cloud">Commercial OS insights, occasionally.</p>
+              <p className="mb-3 text-sm font-semibold text-cloud">Subscribe to NESJA Perspectives.</p>
               <NewsletterForm location="footer" />
             </div>
           </div>
-          <nav aria-label="Footer" className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+          <nav aria-label="Footer" className="grid grid-cols-2 gap-x-6 gap-y-8 break-words sm:grid-cols-4 sm:gap-8">
             {footerNav.map((group) => (
               <div key={group.title}>
                 <p className="text-sm font-semibold text-cloud">{group.title}</p>
@@ -39,7 +39,7 @@ export function Footer() {
         </div>
         <div className="hairline my-10" />
         <div className="flex flex-col gap-6 text-sm text-mist md:flex-row md:items-center md:justify-between">
-          <p>© {new Date().getFullYear()} {siteConfig.legalEntity}. {brandStatements.fabric}</p>
+          <p>© {new Date().getFullYear()} {siteConfig.legalEntity}</p>
           <ul className="flex flex-wrap items-center gap-x-6 gap-y-2">
             {legalNav.map((l) => <li key={l.href}><Link href={l.href} className="hover:text-cloud">{l.label}</Link></li>)}
             <li><CookieSettingsButton /></li>

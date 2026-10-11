@@ -1,5 +1,6 @@
 import type { z } from "zod";
 import type { attributionSchema } from "@/lib/validation";
+import type { EnquiryCategory } from "@/config/enquiries";
 
 export type LeadType = "demo_request" | "contact_sales" | "subscription";
 
@@ -9,9 +10,13 @@ export type LeadType = "demo_request" | "contact_sales" | "subscription";
  */
 export interface Lead {
   type: LeadType;
+  /** Commercial classification. Subscriptions are not enquiries and carry none. */
+  category?: EnquiryCategory;
   contact: { name?: string; email: string; company?: string; role?: string; country?: string };
   details: Record<string, string | number | boolean | undefined>;
   attribution?: z.infer<typeof attributionSchema>;
+  /** Page and form the visitor submitted from (e.g. "/pricing", "pricing-calculator"). */
+  source?: { page?: string; formContext?: string };
   meta: { userAgent: string; referer: string; submittedAt: string };
 }
 

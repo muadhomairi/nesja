@@ -39,7 +39,7 @@ export default function HomePage() {
       </Section>
       <Section id="journey" className="border-t border-white/[0.06] bg-midnight-900/40" eyebrow="Product experience"
         title="From first signal to signed contract — without leaving NESJA."
-        intro="Follow one opportunity through the whole commercial lifecycle. This is the environment your teams would work in every day.">
+        intro="Follow one opportunity through the whole commercial lifecycle. This is the environment your teams work in every day with NESJA.">
         <ProductJourney />
         <div className="mt-12 flex justify-center">
           <ButtonLink href={ctas.seeInAction.href} size="lg" arrow track={{ event: "hero_demo_clicked", props: { location: "journey" } }}>{ctas.seeInAction.label}</ButtonLink>
