@@ -1,0 +1,52 @@
+@import "../styles/tokens.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { color-scheme: dark; scroll-padding-top: calc(var(--header-h) + 1rem); -webkit-text-size-adjust: 100%; }
+  body { @apply bg-midnight text-cloud antialiased; font-feature-settings: "ss01", "cv11"; text-rendering: optimizeLegibility; }
+  ::selection { background: rgb(var(--teal) / 0.3); color: rgb(var(--cloud)); }
+  :focus-visible { outline: 2px solid rgb(var(--teal)); outline-offset: 3px; border-radius: 6px; }
+  h1, h2, h3, h4 { text-wrap: balance; }
+  p { text-wrap: pretty; }
+}
+
+@layer components {
+  .eyebrow { @apply inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-teal; }
+  .surface { @apply rounded-2xl border border-white/[0.07] bg-midnight-800/70 shadow-panel; }
+  .surface-hover { @apply transition-colors duration-300 hover:border-white/[0.14] hover:bg-midnight-700/70; }
+  .hairline { background: linear-gradient(90deg, transparent, rgb(var(--silver) / 0.16), transparent); height: 1px; }
+  .text-gradient { background: linear-gradient(100deg, rgb(var(--cloud)) 30%, rgb(var(--teal-soft)) 75%, rgb(var(--signal-soft))); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .grid-bg {
+    background-image: linear-gradient(rgb(var(--silver) / 0.035) 1px, transparent 1px), linear-gradient(90deg, rgb(var(--silver) / 0.035) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  }
+  .prose-nesja { @apply max-w-none text-[1.0625rem] leading-8 text-silver; }
+  .prose-nesja h2 { @apply mt-14 mb-4 text-2xl font-semibold tracking-tight text-cloud; }
+  .prose-nesja h3 { @apply mt-10 mb-3 text-xl font-semibold text-cloud; }
+  .prose-nesja p { @apply my-5; }
+  .prose-nesja ul { @apply my-5 list-disc space-y-2 ps-6 marker:text-teal; }
+  .prose-nesja strong { @apply font-semibold text-cloud; }
+  .prose-nesja blockquote { @apply my-8 border-s-2 border-teal ps-6 text-xl font-medium leading-relaxed text-cloud; }
+}
+
+@layer utilities {
+  .flow-dash { stroke-dasharray: 3 9; animation: flow 6s linear infinite; }
+  .flow-dash-slow { stroke-dasharray: 2 14; animation: flow 11s linear infinite; }
+}
+
+@keyframes flow { to { stroke-dashoffset: -200; } }
+
+/* Motion system: everything decorative stops for users who ask for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+  .motion-path { display: none; }
+}
+
+@media print {
+  header, footer, [data-print-hidden] { display: none !important; }
+  body { background: #fff; color: #0c1324; }
+  .prose-nesja, .prose-nesja h2, .prose-nesja h3, .prose-nesja strong, .prose-nesja blockquote { color: #0c1324 !important; }
+}

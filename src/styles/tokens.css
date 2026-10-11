@@ -1,0 +1,31 @@
+/*
+ * NESJA.OS design tokens.
+ * Brand palette (approved):
+ *   Midnight Core  #0C1324   Neural Teal  #12C6C2   Signal Blue #4B6BFF
+ *   Cloud White    #F5F7FB   Slate Graphite #5B6678 Soft Silver #C9D1DC
+ * Values are RGB triplets so Tailwind can apply alpha (bg-teal/20 etc).
+ * "mist" is a derived text tone that keeps WCAG AA contrast on Midnight Core
+ * (Slate Graphite is reserved for borders/decoration on dark surfaces).
+ */
+:root {
+  --midnight: 12 19 36;
+  --midnight-900: 8 13 26;
+  --midnight-800: 17 26 47;
+  --midnight-700: 24 35 61;
+  --midnight-600: 35 48 79;
+  --teal: 18 198 194;
+  --teal-soft: 115 224 221;
+  --signal: 75 107 255;
+  --signal-soft: 150 168 255;
+  --cloud: 245 247 251;
+  --graphite: 91 102 120;
+  --silver: 201 209 220;
+  --mist: 154 165 184;
+
+  --radius-card: 1.25rem;
+  --ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 160ms;
+  --dur-base: 280ms;
+  --dur-slow: 700ms;
+  --header-h: 4.25rem;
+}
