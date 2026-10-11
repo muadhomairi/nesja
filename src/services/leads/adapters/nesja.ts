@@ -17,6 +17,9 @@ export const nesjaLeadAdapter: LeadAdapter = {
       body: JSON.stringify({
         source: "website",
         type: lead.type,
+        category: lead.category,
+        sourcePage: lead.source?.page,
+        formContext: lead.source?.formContext,
         contact: lead.contact,
         details: lead.details,
         attribution: lead.attribution,

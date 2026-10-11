@@ -19,9 +19,12 @@ All forms produce one canonical `Lead` (`src/services/leads/types.ts`):
 
 ```ts
 { type: "demo_request" | "contact_sales" | "subscription",
+  category: "DEMO" | "SALES" | "PROPOSAL" | "ENTERPRISE" | "IMPLEMENTATION"
+          | "INTEGRATION" | "SECURITY" | "PARTNERSHIP" | "GENERAL",   // none for subscriptions
   contact: { name, email, company, role, country },
   details: { teamSize, interest, bookingId, message, … },
   attribution: { firstTouch, lastTouch },      // UTM, referrer, landing page, timestamps
+  source: { page, formContext },               // page submitted from + which form/CTA (e.g. "contact:proposal:pricing-calculator")
   meta: { userAgent, referer, submittedAt } }
 ```
 
@@ -31,6 +34,12 @@ All forms produce one canonical `Lead` (`src/services/leads/types.ts`):
 - `LEAD_NOTIFICATION_EMAIL`: optional internal notification for every lead, through the email adapter.
 
 A failed lead write never cancels a confirmed booking; it is logged on the server.
+
+Enquiry categories live in `src/config/enquiries.ts`. CTAs link to `/contact?type=<category>&from=<cta-location>` and the form preselects the category, so every enquiry arrives classified.
+
+**Production without an adapter.** With `LEAD_ADAPTER` unset, the `mock` adapter writes each complete lead to the server log as one `[leads:unrouted] {...}` JSON line, so nothing is silently discarded, but logs are not a durable store. Set `LEAD_ADAPTER` (and ideally `LEAD_NOTIFICATION_EMAIL` with an email provider) before relying on the website for pipeline.
+
+**Demo requests without a calendar.** With `SCHEDULING_PROVIDER=mock`, the visitor chooses a *preferred* time and the confirmation says the NESJA team will confirm it. Nothing tells the visitor they are booked until a real scheduler is connected.
 
 ## Demo scheduling
 

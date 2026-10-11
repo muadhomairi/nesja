@@ -13,14 +13,15 @@ import { Icon } from "./Icon";
 type Variant = "primary" | "secondary" | "ghost" | "quiet";
 type Size = "sm" | "md" | "lg";
 
-const base = "relative inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-semibold transition-all duration-200 ease-brand focus-visible:outline-offset-4 disabled:cursor-not-allowed disabled:opacity-50";
+// Labels wrap only on narrow screens when they would otherwise overflow.
+const base = "relative inline-flex max-w-full items-center justify-center gap-2 text-center sm:whitespace-nowrap rounded-full font-semibold transition-all duration-200 ease-brand focus-visible:outline-offset-4 disabled:cursor-not-allowed disabled:opacity-50";
 const variants: Record<Variant, string> = {
   primary: "bg-teal text-midnight shadow-[0_8px_30px_-10px_rgb(var(--teal)/0.6)] hover:bg-teal-soft hover:shadow-[0_10px_36px_-8px_rgb(var(--teal)/0.7)] active:translate-y-px",
   secondary: "border border-white/15 bg-white/[0.03] text-cloud hover:border-white/30 hover:bg-white/[0.07]",
   ghost: "text-silver hover:text-cloud hover:bg-white/[0.05]",
   quiet: "text-teal hover:text-teal-soft px-0",
 };
-const sizes: Record<Size, string> = { sm: "h-9 px-4 text-sm", md: "h-11 px-5 text-[0.9375rem]", lg: "h-[3.25rem] px-7 text-base" };
+const sizes: Record<Size, string> = { sm: "min-h-9 py-1.5 px-4 text-sm", md: "min-h-11 py-2 px-5 text-[0.9375rem]", lg: "min-h-[3.25rem] py-2.5 px-7 text-base" };
 
 export const buttonClass = (variant: Variant = "primary", size: Size = "md", className?: string) =>
   cn(base, variants[variant], variant === "quiet" ? "h-auto" : sizes[size], className);

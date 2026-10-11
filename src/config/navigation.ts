@@ -40,10 +40,10 @@ export const mainNav: NavItem[] = [
       {
         title: "Learn",
         links: [
-          { label: "All resources", href: "/resources", description: "Insights, guides, playbooks and product updates" },
+          { label: "NESJA Perspectives", href: "/resources", description: "Research, operating models and product insights" },
           { label: "The Commercial OS Manifesto", href: "/resources/commercial-operating-system-manifesto", description: "Our point of view on the category" },
           { label: "Customers", href: "/customers", description: "Customer stories" },
-          ...(features.ecosystemInNav ? [{ label: "Developers", href: "/developers" }, { label: "Integrations", href: "/integrations" }] : []),
+          ...(features.ecosystemInNav ? [{ label: "Developers", href: "/developers" }, { label: "Marketplace", href: "/marketplace" }] : []),
         ],
       },
     ],
@@ -57,8 +57,8 @@ export const mainNav: NavItem[] = [
           { label: "About NESJA", href: "/about", description: "The story behind the name" },
           { label: "Security & trust", href: "/security", description: "How we protect your commercial data" },
           { label: "Integrations", href: "/integrations", description: "Works with the systems you already run" },
-          { label: "Contact sales", href: "/contact", description: "Talk to the NESJA team" },
-          ...(features.ecosystemInNav ? [{ label: "Partners", href: "/partners" }] : []),
+          { label: "Talk to Sales", href: "/contact?type=sales", description: "Talk to the NESJA team" },
+          { label: "Partners", href: "/partners", description: "Partner with NESJA" },
         ],
       },
     ],
@@ -66,14 +66,14 @@ export const mainNav: NavItem[] = [
 ];
 
 export const footerNav: NavGroup[] = [
-  { title: "Platform", links: [{ label: "Overview", href: "/platform" }, ...modules.map((m) => ({ label: m.label, href: `/platform/${m.slug}` }))] },
+  { title: "Platform", links: [{ label: "Overview", href: "/platform" }, ...modules.map((m) => ({ label: m.label, href: `/platform/${m.slug}` })), { label: "Pricing", href: "/pricing" }] },
   { title: "Solutions", links: [{ label: "All solutions", href: "/solutions" }, ...roles.slice(0, 5).map((r) => ({ label: r.role, href: `/solutions/${r.slug}` })), { label: "Industries", href: "/industries" }] },
-  { title: "Resources", links: [{ label: "Resources", href: "/resources" }, { label: "Manifesto", href: "/resources/commercial-operating-system-manifesto" }, { label: "Customers", href: "/customers" }, { label: "Integrations", href: "/integrations" }, { label: "Pricing", href: "/pricing" }] },
-  { title: "Company", links: [{ label: "About", href: "/about" }, { label: "Security", href: "/security" }, { label: "Contact", href: "/contact" }, { label: "Book a Demo", href: "/book-demo" }] },
+  { title: "Resources", links: [{ label: "NESJA Perspectives", href: "/resources" }, { label: "Manifesto", href: "/resources/commercial-operating-system-manifesto" }, { label: "Customer stories", href: "/customers" }, { label: "Integrations", href: "/integrations" }] },
+  { title: "Company", links: [{ label: "About", href: "/about" }, { label: "Security", href: "/security" }, { label: "Partners", href: "/partners" }, { label: "Contact", href: "/contact" }, { label: "Book a Demo", href: "/book-demo" }] },
 ];
 
 export const legalNav: NavLink[] = [
-  { label: "Privacy", href: "/privacy" },
-  { label: "Terms", href: "/terms" },
+  { label: "Privacy Policy", href: "/privacy" },
+  { label: "Terms of Use", href: "/terms" },
   { label: "Cookie Policy", href: "/cookies" },
 ];

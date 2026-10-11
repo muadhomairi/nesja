@@ -8,7 +8,7 @@ export const siteConfig = {
   category: "The Commercial Operating System",
   tagline: "One commercial fabric. Infinite intelligence.",
   description:
-    "NESJA.OS is the Commercial Operating System. It connects marketing, pipeline, quoting, contracts, communication, customer success and intelligence in one platform.",
+    "NESJA.OS is the Commercial Operating System. It connects marketing, pipeline management, CPQ and quoting, contract management, communication, customer success and commercial intelligence in one AI-powered platform.",
   url: (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, ""),
   /** Where "Sign in" ultimately sends users once the NESJA application is connected. */
   appUrl: process.env.NEXT_PUBLIC_APP_URL || "",
@@ -35,7 +35,7 @@ export const features = {
   currencySelector: true,
   /** Language switcher. Turn on when Arabic content is reviewed and complete. */
   localeSwitcher: false,
-  /** Future ecosystem pages are routable but kept out of primary navigation until launched. */
+  /** Roadmap ecosystem pages (developers, marketplace) are routable but kept out of navigation until available. */
   ecosystemInNav: false,
 } as const;
 

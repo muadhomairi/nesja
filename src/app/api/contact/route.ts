@@ -1,5 +1,5 @@
 import { contactSchema } from "@/lib/validation";
-import { json, parseBody, requestMeta } from "@/lib/server/http";
+import { json, leadSource, parseBody, requestMeta } from "@/lib/server/http";
 import { getLeadService } from "@/services/leads";
 import { contactAcknowledgement } from "@/services/email/templates";
 import { notifyTeam, safeSend } from "@/services/notify";
@@ -13,12 +13,19 @@ export async function POST(req: Request) {
   try {
     const result = await getLeadService().submit({
       type: "contact_sales",
+      category: d.enquiryType,
       contact: { name: d.name, email: d.email, company: d.company, role: d.role, country: d.country || undefined },
       details: { message: d.message, enterprise: d.enterprise, companySize: d.companySize || undefined, estimatedUsers: d.estimatedUsers === "" ? undefined : d.estimatedUsers },
       attribution: d.attribution,
+      source: leadSource(req, d.submission),
       meta: requestMeta(req),
     });
-    await Promise.all([safeSend({ to: d.email, ...contactAcknowledgement({ name: d.name }) }), notifyTeam("contact_sales", { ...d, attribution: d.attribution?.lastTouch })]);
+    const { website: _hp, submission, ...summary } = d;
+    void _hp;
+    await Promise.all([
+      safeSend({ to: d.email, ...contactAcknowledgement({ name: d.name }) }),
+      notifyTeam(`${d.enquiryType} enquiry`, { ...summary, sourcePage: submission?.sourcePage, formContext: submission?.formContext, attribution: d.attribution?.lastTouch }),
+    ]);
     return json({ ok: true, id: result.id });
   } catch (e) {
     console.error("[contact] lead submission failed", e);

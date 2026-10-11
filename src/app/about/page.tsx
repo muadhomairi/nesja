@@ -6,7 +6,7 @@ import { buildMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
   title: "About NESJA",
-  description: "NESJA comes from the Arabic نسج, to weave. We are building the Commercial Operating System that weaves every commercial thread into one intelligent fabric.",
+  description: "NESJA comes from the Arabic نسج, to weave. NESJA.OS is the Commercial Operating System that weaves every commercial thread into one intelligent fabric.",
   path: "/about",
 });
 
@@ -50,7 +50,7 @@ export default function AboutPage() {
         </ul>
       </Section>
       <Section id="ambition" className="border-t border-white/[0.06]" eyebrow="Our ambition" title="A global commercial platform, built from the start for scale.">
-        <p className="max-w-3xl text-lg leading-relaxed text-mist">We are building for organisations of every size and in every region: in the cloud, in dedicated environments and in sovereign deployments, in English today and in Arabic as we grow. The Commercial Operating System is a new category, and we intend to define it.</p>
+        <p className="max-w-3xl text-lg leading-relaxed text-mist">NESJA is designed for organisations of every size and in every region, with cloud, dedicated and sovereign deployment models. The product is available in English today, with Arabic on our roadmap. The Commercial Operating System is a new category, and NESJA sets out to define it.</p>
       </Section>
       <FinalCta location="about-final" />
     </>

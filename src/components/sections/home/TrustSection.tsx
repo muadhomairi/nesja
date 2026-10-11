@@ -11,7 +11,7 @@ export function TrustSection() {
         <div>
           <p className="eyebrow mb-4">Trust</p>
           <h2 id="trust-title" className="text-display-md text-cloud">Built for organisations that can&apos;t afford to get it wrong.</h2>
-          <p className="mt-5 text-lg leading-relaxed text-mist">Commercial data is among the most sensitive data a company holds. NESJA is designed for dedicated, private and sovereign deployment, and we publish the real status of every certification.</p>
+          <p className="mt-5 text-lg leading-relaxed text-mist">Commercial data is among the most sensitive data a company holds. NESJA is designed for dedicated, private and sovereign deployment, and we publish the real status of every certification on our roadmap.</p>
           <Link href="/security" className="mt-7 inline-flex items-center gap-1.5 font-semibold text-teal hover:text-teal-soft">Security & trust <Icon name="arrowRight" className="h-4 w-4 rtl:-scale-x-100" /></Link>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -23,6 +23,7 @@ export function TrustSection() {
             </div>
           ))}
           <div className="flex flex-wrap items-center gap-2 sm:col-span-2">
+            <span className="me-1 text-xs font-medium uppercase tracking-[0.14em] text-mist">{visible(certifications).every((c) => c.status === "achieved") ? "Certifications" : "Certification roadmap"}</span>
             {visible(certifications).map((c) => (
               <Badge key={c.id} tone={c.status === "achieved" ? "teal" : "neutral"}>{c.name} · {statusLabel[c.status]}</Badge>
             ))}

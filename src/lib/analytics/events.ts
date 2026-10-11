@@ -14,8 +14,8 @@ export interface AnalyticsEventMap {
   demo_started: { source?: string };
   demo_step_completed: { step: number; name: string };
   demo_completed: { teamSize: string; interest: string; provider: string };
-  contact_sales_clicked: { location: string };
-  contact_submitted: { enterprise: boolean };
+  contact_sales_clicked: { location: string; cta?: string };
+  contact_submitted: { enterprise: boolean; enquiryType: string };
   module_viewed: { module: string };
   journey_step_viewed: { step: string };
   case_study_viewed: { slug: string };

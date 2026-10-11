@@ -80,7 +80,7 @@ function Toggle({ id, label, description, checked, disabled, onChange }: { id: s
 }
 
 export function CookieSettingsButton() {
-  return <button type="button" onClick={openConsentPreferences} className="hover:text-cloud">Cookie settings</button>;
+  return <button type="button" onClick={openConsentPreferences} className="hover:text-cloud">Cookie Settings</button>;
 }
 
 export type { ConsentState };

@@ -45,14 +45,14 @@ export const TextArea = forwardRef<HTMLTextAreaElement, Base & TextareaHTMLAttri
   );
 });
 
-export const SelectField = forwardRef<HTMLSelectElement, Base & SelectHTMLAttributes<HTMLSelectElement> & { options: readonly string[]; placeholder?: string }>(
-  function SelectField({ label, name, error, hint, optional, className, options, placeholder = "Select…", ...rest }, ref) {
+export const SelectField = forwardRef<HTMLSelectElement, Base & SelectHTMLAttributes<HTMLSelectElement> & { options: readonly string[]; optionLabels?: Record<string, string>; placeholder?: string }>(
+  function SelectField({ label, name, error, hint, optional, className, options, optionLabels, placeholder = "Select…", ...rest }, ref) {
     return (
       <Wrapper {...{ label, name, error, hint, optional, className }}>
         <div className="relative">
           <select ref={ref} id={name} name={name} className={cn(control, tone(error), "h-12 appearance-none pe-10")} aria-invalid={!!error || undefined} aria-describedby={describedBy(name, error, hint)} required={!optional} {...rest}>
             <option value="">{placeholder}</option>
-            {options.map((o) => <option key={o} value={o}>{o}</option>)}
+            {options.map((o) => <option key={o} value={o}>{optionLabels?.[o] ?? o}</option>)}
           </select>
           <Icon name="chevronDown" className="pointer-events-none absolute end-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-mist" />
         </div>

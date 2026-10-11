@@ -39,7 +39,7 @@ export const controls: TrustItem[] = [
 export const securityPrinciples = [
   { title: "Your data is yours", body: "Customer data belongs to the customer. We process it to deliver NESJA, and nothing else." },
   { title: "Least privilege", body: "Access to customer environments is restricted, justified and reviewed." },
-  { title: "Transparency over claims", body: "We publish the status of every certification and control on this page, including the ones still in progress." },
+  { title: "Transparency over claims", body: "We publish the status of every certification and control, including those on our roadmap." },
   { title: "Built for regulated industries", body: "Our architecture is designed for dedicated, private and sovereign deployment models." },
 ];
 

@@ -89,3 +89,9 @@ export function persistAttributionAfterConsent() {
     if (session && !window.localStorage.getItem(KEY)) window.localStorage.setItem(KEY, session);
   } catch { /* ignore */ }
 }
+
+/** The page and form a submission came from. Sent with every enquiry. */
+export function submissionContext(formContext: string) {
+  if (typeof window === "undefined") return undefined;
+  return { sourcePage: window.location.pathname + window.location.search, formContext: formContext.slice(0, 300), clientTimestamp: new Date().toISOString() };
+}

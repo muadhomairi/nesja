@@ -6,14 +6,15 @@ import { buildMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildMetadata({
   title: "Book a Demo",
-  description: "See NESJA.OS in action. A 30-minute walkthrough of the Commercial Operating System, tailored to your team.",
+  description: "Book a NESJA.OS product demonstration tailored to your organisation: your use cases, your deployment and your commercial requirements.",
   path: "/book-demo",
 });
 
 const expect = [
-  { icon: "users", t: "Tailored to your team", b: "We focus on the commercial motions that matter most to you." },
-  { icon: "pipeline", t: "The full lifecycle, live", b: "From first signal to signed contract, in the real product." },
-  { icon: "quote", t: "Clear economics", b: "Pricing for your team size and commitment, with no surprises." },
+  { icon: "users", t: "Tailored to your organisation", b: "We focus on your use cases and the commercial motions that matter most to you." },
+  { icon: "pipeline", t: "The product, live", b: "From first signal to signed contract, demonstrated in NESJA.OS." },
+  { icon: "globe", t: "Deployment, discussed", b: "Deployment model, integrations, security and implementation for your environment." },
+  { icon: "quote", t: "Commercial requirements", b: "Editions, users and terms, and the next step to a proposal." },
 ];
 
 export default function BookDemoPage() {
@@ -24,7 +25,7 @@ export default function BookDemoPage() {
         <div className="lg:pt-6">
           <p className="eyebrow mb-4">Book a Demo</p>
           <h1 className="text-display-lg text-cloud">See NESJA in action.</h1>
-          <p className="mt-5 text-lg leading-relaxed text-mist">Thirty minutes with a NESJA specialist. Five quick steps, and you choose the time.</p>
+          <p className="mt-5 text-lg leading-relaxed text-mist">A 30-minute product demonstration with a NESJA specialist, tailored to your organisation, your use cases and your deployment.</p>
           <ul className="mt-10 hidden space-y-6 lg:block">
             {expect.map((e) => (
               <li key={e.t} className="flex gap-4">
