@@ -10,7 +10,7 @@ export const metadata = { title: "Approvals" };
 export default async function Approvals({ searchParams }: { searchParams: Promise<ListParams> }) {
   const sp = await searchParams; const pg = paging(sp);
   const { rows, me, canDecide } = await asUser(async (db, s) => ({ me: s.userId, canDecide: s.can("approval.edit"), rows: await many<Record<string, string>>(db, `
-    select r.id, r.kind, r.entity, r.entity_id, r.reason, r.measured_value, r.threshold_value, r.status, r.created_at, r.decided_at, r.requested_by, rq.full_name as requester, ap.full_name as approver
+    select r.id, r.kind, r.entity, r.entity_id, r.reason, r.measured_value, r.threshold_value, r.status, r.created_at, r.decided_at, r.requested_by, coalesce(rq.full_name, rq.email) as requester, coalesce(ap.full_name, ap.email) as approver
     from public.approval_requests r left join public.profiles rq on rq.user_id = r.requested_by left join public.profiles ap on ap.user_id = r.approver_id
     where r.tenant_id = $1 and ($2::public.approval_status is null or r.status = $2) order by r.status = 'pending' desc, r.created_at desc limit $3 offset $4`,
     [s.org.id, ["pending", "approved", "rejected"].includes(sp.status ?? "") ? sp.status : null, pg.limit + 1, pg.offset]) }), "approval.view");

@@ -5,6 +5,7 @@ import "@fontsource/ibm-plex-sans-arabic/400.css";
 import "@fontsource/ibm-plex-sans-arabic/600.css";
 import "./globals.css";
 import { getLocale } from "@/lib/i18n";
+import Script from "next/script";
 import { themeScript } from "@/components/shell/theme-toggle";
 
 export const metadata: Metadata = { title: { default: "NESJA.OS", template: "%s · NESJA.OS" }, description: "NESJA.OS: the commercial operating system.", robots: { index: false, follow: false } };
@@ -13,8 +14,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const locale = await getLocale();
   return (
     <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"} suppressHydrationWarning>
-      <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
-      <body>{children}</body>
+      <body>
+        <Script id="nesja-theme" strategy="beforeInteractive">{themeScript}</Script>
+        {children}
+      </body>
     </html>
   );
 }

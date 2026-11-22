@@ -42,8 +42,8 @@ export async function changeStage(oppId: string, stage: string, lossReason?: str
         if (!blk?.accepted) throw Object.assign(new Error("Closed Won needs an accepted quotation."), { code: "22023" });
         if (blk.open_appr) throw Object.assign(new Error("Closed Won is blocked until pending approvals are decided."), { code: "22023" });
       }
-      const r = await db.query(`update public.opportunities set stage = $3, probability = $4, closed_at = case when $3 in ('closed_won','closed_lost') then now() else null end,
-        loss_reason = case when $3 = 'closed_lost' then $5 else null end where tenant_id = $1 and id = $2`, [s.org.id, oppId, stage, STAGE_PROB[stage], lossReason ?? null]);
+      const r = await db.query(`update public.opportunities set stage = $3::public.opp_stage, probability = $4, closed_at = case when $3::text in ('closed_won','closed_lost') then now() else null end,
+        loss_reason = case when $3::text = 'closed_lost' then $5 else null end where tenant_id = $1 and id = $2`, [s.org.id, oppId, stage, STAGE_PROB[stage], lossReason ?? null]);
       if (!r.rowCount) throw Object.assign(new Error("permission denied"), { code: "42501" });
     });
   } catch (e) { return (e as Error).message && (e as { code?: string }).code === "22023" ? (e as Error).message : dbErrorMessage(e); }
@@ -110,7 +110,7 @@ export async function setQuoteStatus(quoteId: string, status: "issued" | "accept
     await withUser(s.userId, async (db) => {
       const pending = await one<{ n: number }>(db, "select count(*)::int as n from public.approval_requests where tenant_id = $1 and entity_id = $2 and status in ('pending','rejected')", [s.org.id, quoteId]);
       if (status !== "rejected" && pending?.n) throw Object.assign(new Error("This quotation has an approval that is pending or rejected."), { code: "22023" });
-      await db.query("update public.quotes set status = $3, issued_at = coalesce(issued_at, case when $3 = 'issued' then now() end) where tenant_id = $1 and id = $2", [s.org.id, quoteId, status]);
+      await db.query("update public.quotes set status = $3::public.quote_status, issued_at = coalesce(issued_at, case when $3::text = 'issued' then now() end) where tenant_id = $1 and id = $2", [s.org.id, quoteId, status]);
     });
   } catch (e) { return (e as { code?: string }).code === "22023" ? (e as Error).message : dbErrorMessage(e); }
   revalidatePath(`/commercial/quotes/${quoteId}`);

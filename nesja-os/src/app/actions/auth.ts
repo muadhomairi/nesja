@@ -60,7 +60,7 @@ export async function resetAction(_: FormState, form: FormData): Promise<FormSta
   const { data, error } = await supabase.auth.updateUser({ password: p.data });
   if (error) return { ok: false, message: "The reset link has expired. Request a new one." };
   await authAudit("password_reset", data.user?.id ?? null, {});
-  redirect("/launcher");
+  redirect(safeNext(form.get("next")));
 }
 
 export async function signOutAction() {

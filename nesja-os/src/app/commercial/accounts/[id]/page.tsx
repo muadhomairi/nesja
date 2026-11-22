@@ -13,7 +13,7 @@ export default async function Account360({ params }: { params: Promise<{ id: str
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
   const d = await asUser(async (db, s) => {
     const t = s.org.id;
-    const a = await one<Record<string, string | null>>(db, "select a.*, p.full_name as owner from public.accounts a left join public.profiles p on p.user_id = a.owner_id where a.tenant_id = $1 and a.id = $2", [t, id]);
+    const a = await one<Record<string, string | null>>(db, "select a.*, coalesce(p.full_name, p.email) as owner from public.accounts a left join public.profiles p on p.user_id = a.owner_id where a.tenant_id = $1 and a.id = $2", [t, id]);
     if (!a) return null;
     const [contacts, opps, ags, acts, fin] = await Promise.all([
       many<Record<string, string>>(db, "select id, full_name, title, email, phone, is_primary from public.contacts where tenant_id = $1 and account_id = $2 order by is_primary desc, full_name", [t, id]),

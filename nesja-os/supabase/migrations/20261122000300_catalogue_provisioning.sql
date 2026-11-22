@@ -120,8 +120,8 @@ begin
    where actor_user_id = v_user and action = 'create' and entity = 'tenants' and occurred_at > now() - interval '24 hours';
   if v_recent >= 3 then raise exception 'organization limit reached; try again tomorrow' using errcode = '54000'; end if;
 
-  insert into public.profiles(user_id, email)
-  select u.id, u.email from auth.users u where u.id = v_user
+  insert into public.profiles(user_id, email, full_name)
+  select u.id, u.email, nullif(trim(u.raw_user_meta_data ->> 'full_name'), '') from auth.users u where u.id = v_user
   on conflict (user_id) do nothing;
 
   insert into public.tenants(slug, name, kind, status, base_currency, trial_ends_at)
@@ -185,7 +185,9 @@ begin
   end if;
   if v_inv.email <> v_email then raise exception 'invitation was sent to a different address' using errcode = '42501'; end if;
 
-  insert into public.profiles(user_id, email) values (auth.uid(), v_email) on conflict (user_id) do nothing;
+  insert into public.profiles(user_id, email, full_name)
+  select auth.uid(), v_email, nullif(trim(u.raw_user_meta_data ->> 'full_name'), '') from auth.users u where u.id = auth.uid()
+  on conflict (user_id) do nothing;
   insert into public.memberships(tenant_id, user_id, role_id, business_unit_id, status)
   values (v_inv.tenant_id, auth.uid(), v_inv.role_id, v_inv.business_unit_id, 'active')
   on conflict (tenant_id, user_id) do update set role_id = excluded.role_id, status = 'active';

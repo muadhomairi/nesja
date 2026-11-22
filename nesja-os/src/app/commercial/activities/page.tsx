@@ -9,7 +9,7 @@ export const metadata = { title: "Activities" };
 export default async function Activities({ searchParams }: { searchParams: Promise<ListParams> }) {
   const sp = await searchParams; const pg = paging(sp);
   const rows = await asUser((db, s) => many<Record<string, string>>(db, `
-    select x.id, x.kind, x.subject, x.due_at, x.completed_at, x.opportunity_id, x.account_id, p.full_name as owner from public.activities x left join public.profiles p on p.user_id = x.owner_id
+    select x.id, x.kind, x.subject, x.due_at, x.completed_at, x.opportunity_id, x.account_id, coalesce(p.full_name, p.email) as owner from public.activities x left join public.profiles p on p.user_id = x.owner_id
     where x.tenant_id = $1 and ($2::text is null or x.subject ilike $2) and ($3::uuid is null or x.account_id = $3) and ($4::text is null or ($4 = 'open' and x.completed_at is null) or ($4 = 'overdue' and x.completed_at is null and x.due_at < now()))
     order by x.due_at desc limit $5 offset $6`, [s.org.id, like(sp.q), /^[0-9a-f-]{36}$/.test(sp.account ?? "") ? sp.account : null, sp.status || null, pg.limit + 1, pg.offset]), "activity.view");
   return (<>

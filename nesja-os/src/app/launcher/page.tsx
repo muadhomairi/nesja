@@ -8,7 +8,8 @@ import { OrgSwitcher } from "@/components/shell/org-switcher";
 import { env } from "@/lib/env";
 
 export const metadata = { title: "NESJA platform" };
-export default async function Launcher() {
+export default async function Launcher({ searchParams }: { searchParams: Promise<{ invite_error?: string }> }) {
+  const { invite_error } = await searchParams;
   const s = await requireSession();
   if (!s.orgs.length) return (await import("next/navigation")).redirect("/onboarding");
   const engageUrl = env.engageUrl();
@@ -30,6 +31,7 @@ export default async function Launcher() {
         </div>
       </header>
       <main className="mx-auto max-w-5xl px-6 py-12">
+        {invite_error && <div className="mb-4 rounded-lg border border-bad/30 bg-bad/8 px-3 py-2 text-sm" role="alert">Invitation not accepted: {invite_error.slice(0, 200)}</div>}
         <p className="text-sm text-muted">{s.org?.name}{s.org?.kind === "demo" ? " · demonstration" : ""}</p>
         <h1 className="page-title mt-1 text-3xl font-semibold tracking-tight">Welcome{s.fullName ? `, ${s.fullName.split(" ")[0]}` : ""}</h1>
         <div className="mt-8 grid gap-4 md:grid-cols-3">

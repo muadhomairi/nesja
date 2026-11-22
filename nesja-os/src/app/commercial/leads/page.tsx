@@ -10,7 +10,7 @@ export const metadata = { title: "Leads" };
 export default async function Leads({ searchParams }: { searchParams: Promise<ListParams> }) {
   const sp = await searchParams; const pg = paging(sp);
   const { rows, cur } = await asUser(async (db, s) => ({ cur: s.org.base_currency, rows: await many<Record<string, string>>(db, `
-    select l.id, l.number, l.company_name, l.contact_name, l.source, l.status, l.estimated_value, l.created_at, l.converted_opportunity_id, p.full_name as owner
+    select l.id, l.number, l.company_name, l.contact_name, l.source, l.status, l.estimated_value, l.created_at, l.converted_opportunity_id, coalesce(p.full_name, p.email) as owner
     from public.leads l left join public.profiles p on p.user_id = l.owner_id
     where l.tenant_id = $1 and ($2::text is null or l.company_name ilike $2 or l.number ilike $2 or l.contact_name ilike $2) and ($3::public.lead_status is null or l.status = $3)
     order by l.created_at desc limit $4 offset $5`, [s.org.id, like(sp.q), ST.includes(sp.status ?? "") ? sp.status : null, pg.limit + 1, pg.offset]) }), "lead.view");

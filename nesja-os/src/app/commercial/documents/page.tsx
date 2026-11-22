@@ -13,7 +13,7 @@ export const metadata = { title: "Documents & sales kit" };
 export default async function Documents({ searchParams }: { searchParams: Promise<ListParams> }) {
   const sp = await searchParams; const pg = paging(sp);
   const { rows, canUpload } = await asUser(async (db, s) => ({ canUpload: s.can("document.create"), rows: await many<Record<string, string>>(db, `
-    select d.id, d.name, d.category, d.mime_type, d.size_bytes, d.created_at, p.full_name as owner from public.documents d left join public.profiles p on p.user_id = d.owner_id
+    select d.id, d.name, d.category, d.mime_type, d.size_bytes, d.created_at, coalesce(p.full_name, p.email) as owner from public.documents d left join public.profiles p on p.user_id = d.owner_id
     where d.tenant_id = $1 and ($2::text is null or d.name ilike $2) and ($3::text is null or d.category = $3) order by d.created_at desc limit $4 offset $5`,
     [s.org.id, like(sp.q), CAT.includes(sp.category ?? "") ? sp.category : null, pg.limit + 1, pg.offset]) }), "document.view");
   return (<>

@@ -45,8 +45,9 @@ export async function inviteAction(_: FormState, form: FormData): Promise<FormSt
     const token = (await withUser(s.userId, (db) => one<{ t: string }>(db, "select public.invite_member($1, $2, $3) as t", [s.org!.id, emailV.data, role])))!.t;
     const link = `${env.siteUrl()}/auth/accept?token=${token}`;
     // Supabase sends the e-mail (its SMTP settings). Existing users receive a magic link that lands on the same page.
-    const { error } = await supabaseAdmin().auth.admin.inviteUserByEmail(emailV.data, { redirectTo: link, data: { invited_to: s.org.name } });
-    if (error && !/already been registered/i.test(error.message)) return { ok: true, message: `Invitation created, but the e-mail could not be sent. Share this link: ${link}` };
+    const { error } = await supabaseAdmin().auth.admin.inviteUserByEmail(emailV.data, { redirectTo: `${env.siteUrl()}/auth/confirm?setpw=1&next=${encodeURIComponent(`/auth/accept?token=${token}`)}`, data: { invited_to: s.org.name } });
+    if (error && /already been registered/i.test(error.message)) return { ok: true, message: `${emailV.data} already has a NESJA account. Share this link with them: ${link}` };
+    if (error) return { ok: true, message: `Invitation created, but the e-mail could not be sent. Share this link: ${link}` };
     return { ok: true, message: `Invitation sent to ${emailV.data}.` };
   } catch (e) { return { ok: false, message: dbErrorMessage(e) }; }
 }

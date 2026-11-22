@@ -13,12 +13,12 @@ export default async function Opportunity({ params }: { params: Promise<{ id: st
   const { id } = await params;
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
   const d = await asUser(async (db, s) => {
-    const o = await one<Record<string, string>>(db, `select o.*, a.name as account, p.full_name as owner from public.opportunities o join public.accounts a on a.tenant_id = o.tenant_id and a.id = o.account_id
+    const o = await one<Record<string, string>>(db, `select o.*, a.name as account, coalesce(p.full_name, p.email) as owner from public.opportunities o join public.accounts a on a.tenant_id = o.tenant_id and a.id = o.account_id
       left join public.profiles p on p.user_id = o.owner_id where o.tenant_id = $1 and o.id = $2`, [s.org.id, id]);
     if (!o) return null;
     const quotes = await many<Record<string, string>>(db, `select q.id, q.number, q.revision, q.status, qt.tcv, qt.total_cost from public.quotes q join public.quote_totals qt on qt.tenant_id = q.tenant_id and qt.quote_id = q.id
       where q.tenant_id = $1 and q.opportunity_id = $2 order by q.number, q.revision desc`, [s.org.id, id]);
-    const history = await many<Record<string, string>>(db, "select h.from_stage, h.to_stage, h.changed_at, p.full_name from public.opportunity_stage_history h left join public.profiles p on p.user_id = h.changed_by where h.tenant_id = $1 and h.opportunity_id = $2 order by h.changed_at desc", [s.org.id, id]);
+    const history = await many<Record<string, string>>(db, "select h.from_stage, h.to_stage, h.changed_at, coalesce(p.full_name, p.email) as full_name from public.opportunity_stage_history h left join public.profiles p on p.user_id = h.changed_by where h.tenant_id = $1 and h.opportunity_id = $2 order by h.changed_at desc", [s.org.id, id]);
     const items = await many<{ code: string; description: string; pricing_model: string; unit_price: string; unit_cost: string }>(db, "select i.code, i.description, i.pricing_model, i.unit_price, i.unit_cost from public.rate_card_items i where i.tenant_id = $1 order by i.code", [s.org.id]);
     return { o, quotes, history, items, cur: s.org.base_currency, margin: s.can("opportunity.view_margin"), canEdit: s.can("opportunity.edit"), canQuote: s.can("quote.create") };
   }, "opportunity.view");

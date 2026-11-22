@@ -10,7 +10,7 @@ export default function Demo() {
         <li>· Six guided journeys from lead to contract, tender, renewal and margin recovery</li>
         <li>· Every company, person and figure is synthetic</li>
       </ul>
-      <ActionForm action={async (s) => startDemo(s)} submit="Start the demo" pending="Preparing your session…"><span /></ActionForm>
+      <ActionForm action={startDemo} submit="Start the demo" pending="Preparing your session…"><span /></ActionForm>
       <p className="mt-3 text-xs text-subtle">Your demo session is removed after 24 hours.</p>
     </AuthFrame>
   );

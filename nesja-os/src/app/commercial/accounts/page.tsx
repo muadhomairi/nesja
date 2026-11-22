@@ -11,7 +11,7 @@ export const metadata = { title: "Accounts" };
 export default async function Accounts({ searchParams }: { searchParams: Promise<ListParams> }) {
   const sp = await searchParams; const pg = paging(sp);
   const { rows, cur } = await asUser(async (db, s) => ({ cur: s.org.base_currency, rows: await many<Row>(db, `
-    select a.id, a.number, a.name, a.industry, a.country, a.segment, a.health_score, p.full_name as owner,
+    select a.id, a.number, a.name, a.industry, a.country, a.segment, a.health_score, coalesce(p.full_name, p.email) as owner,
       coalesce((select sum(o.tcv) from public.opportunities o where o.tenant_id = a.tenant_id and o.account_id = a.id and o.stage not in ('closed_won','closed_lost')), 0) as open_pipeline,
       coalesce((select sum(g.contract_value) from public.agreements g where g.tenant_id = a.tenant_id and g.account_id = a.id and g.status = 'active'), 0) as contract_value
     from public.accounts a left join public.profiles p on p.user_id = a.owner_id

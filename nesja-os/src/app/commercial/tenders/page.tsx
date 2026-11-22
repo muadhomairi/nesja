@@ -11,7 +11,7 @@ export default async function Tenders({ searchParams }: { searchParams: Promise<
   const sp = await searchParams; const pg = paging(sp);
   const { rows, cur, k } = await asUser(async (db, s) => ({ cur: s.org.base_currency,
     k: (await many<{ status: string; n: number; v: string }>(db, "select status::text, count(*)::int as n, coalesce(sum(bid_value),0) as v from public.tenders where tenant_id = $1 group by status", [s.org.id])),
-    rows: await many<Record<string, string>>(db, `select t.id, t.reference, t.title, t.status, t.submission_due, t.bid_value, t.go_no_go, t.opportunity_id, a.name as account, p.full_name as owner
+    rows: await many<Record<string, string>>(db, `select t.id, t.reference, t.title, t.status, t.submission_due, t.bid_value, t.go_no_go, t.opportunity_id, a.name as account, coalesce(p.full_name, p.email) as owner
       from public.tenders t join public.accounts a on a.tenant_id = t.tenant_id and a.id = t.account_id left join public.profiles p on p.user_id = t.owner_id
       where t.tenant_id = $1 and ($2::text is null or t.title ilike $2 or t.reference ilike $2 or a.name ilike $2) and ($3::public.tender_status is null or t.status = $3)
       order by t.submission_due desc nulls last limit $4 offset $5`, [s.org.id, like(sp.q), ST.includes(sp.status ?? "") ? sp.status : null, pg.limit + 1, pg.offset]) }), "tender.view");

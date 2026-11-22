@@ -15,7 +15,7 @@ export default async function Admin() {
       join public.roles r on r.tenant_id = m.tenant_id and r.id = m.role_id left join public.business_units b on b.tenant_id = m.tenant_id and b.id = m.business_unit_id where m.tenant_id = $1 order by p.full_name`, [s.org.id]),
     invites: await many<Record<string, string>>(db, `select i.email, r.name as role, i.expires_at, i.accepted_at from public.invitations i join public.roles r on r.tenant_id = i.tenant_id and r.id = i.role_id where i.tenant_id = $1 order by i.created_at desc limit 50`, [s.org.id]),
     roles: await many<{ key: string; name: string; n: number }>(db, "select r.key, r.name, count(rp.permission_code)::int as n from public.roles r left join public.role_permissions rp on rp.tenant_id = r.tenant_id and rp.role_id = r.id where r.tenant_id = $1 group by r.key, r.name order by r.name", [s.org.id]),
-    audit: s.can("admin.audit") ? await many<Record<string, string>>(db, "select l.occurred_at, l.action, l.entity, l.actor_kind, p.full_name from public.audit_log l left join public.profiles p on p.user_id = l.actor_user_id where l.tenant_id = $1 order by l.id desc limit 30", [s.org.id]) : [],
+    audit: s.can("admin.audit") ? await many<Record<string, string>>(db, "select l.occurred_at, l.action, l.entity, l.actor_kind, coalesce(p.full_name, p.email) as full_name from public.audit_log l left join public.profiles p on p.user_id = l.actor_user_id where l.tenant_id = $1 order by l.id desc limit 30", [s.org.id]) : [],
   }), "admin.users");
   return (<>
     <PageHeader title="Organization administration" subtitle={`${d.org.name} · ${d.org.slug}`} />

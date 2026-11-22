@@ -14,7 +14,7 @@ export default async function Opportunities({ searchParams }: { searchParams: Pr
   const sp = await searchParams; const pg = paging(sp);
   const stage = STAGES.includes(sp.stage ?? "") ? sp.stage! : null;
   const { rows, cur, margin, canCreate } = await asUser(async (db, s) => ({ cur: s.org.base_currency, margin: s.can("opportunity.view_margin"), canCreate: s.can("opportunity.create"), rows: await many<Row>(db, `
-    select o.id, o.number, o.name, a.name as account, o.stage, o.revenue_type, o.tcv, o.weighted_value, o.gross_margin, o.expected_close, o.probability, p.full_name as owner
+    select o.id, o.number, o.name, a.name as account, o.stage, o.revenue_type, o.tcv, o.weighted_value, o.gross_margin, o.expected_close, o.probability, coalesce(p.full_name, p.email) as owner
     from public.opportunities o join public.accounts a on a.tenant_id = o.tenant_id and a.id = o.account_id left join public.profiles p on p.user_id = o.owner_id
     where o.tenant_id = $1 and ($2::text is null or o.name ilike $2 or o.number ilike $2 or a.name ilike $2)
       and ($3::public.opp_stage is null or o.stage = $3) and ($4::text is null or ($4 = 'open' and o.stage not in ('closed_won','closed_lost')))

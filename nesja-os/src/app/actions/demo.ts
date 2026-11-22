@@ -13,7 +13,7 @@ import type { FormState } from "./validation";
  * Starts a private demo session: a throwaway user with the read-only Executive role in the shared, synthetic
  * Northstar tenant. Abuse protection: 3 sessions per network per hour; demo users are deleted after 24 hours.
  */
-export async function startDemo(_: FormState): Promise<FormState> {
+export async function startDemo(_: FormState, _form?: FormData): Promise<FormState> {
   const tenant = env.demoTenantId();
   if (!tenant) return { ok: false, message: "The demonstration environment is not loaded yet." };
   const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
