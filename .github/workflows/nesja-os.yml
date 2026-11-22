@@ -14,8 +14,8 @@ jobs:
       run:
         working-directory: nesja-os
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -23,8 +23,10 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
+      - name: Ensure PostgreSQL server binaries
+        run: ls /usr/lib/postgresql/*/bin/initdb >/dev/null 2>&1 || (sudo apt-get update -q && sudo apt-get install -yq postgresql)
       - name: Database tests (migrations, RLS, tenant isolation, demo reconciliation)
-        run: PGBIN=/usr/lib/postgresql/16/bin npm run test:db
+        run: npm run test:db
       - name: Build
         run: npm run build
         env:
