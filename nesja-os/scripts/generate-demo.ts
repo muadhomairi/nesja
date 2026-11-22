@@ -9,7 +9,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { createHash } from "node:crypto";
-import { fmt2, priceQuote, round2, dec, type QuoteLineInput } from "../src/lib/finance";
+import { amortise, fmt2, priceQuote, round2, dec, type QuoteLineInput } from "../src/lib/finance";
 
 const args = new Map<string, string>();
 for (let i = 2; i < process.argv.length; i += 2) args.set(process.argv[i].replace(/^--/, ""), process.argv[i + 1]);
@@ -230,11 +230,14 @@ const renewals = valued.slice(0, 80).map((a, i) => {
 const firstMonth = new Date(Date.UTC(2024, 11, 1));
 const actuals: Record<string, unknown>[] = [];
 valued.forEach((a, ai) => {
-  const o = a.o!; const monthly = round2(dec(o.tcv).dividedBy(o.term)); const plannedCostRatio = dec(o.cost).dividedBy(o.tcv);
+  const o = a.o!; const schedule = amortise(o.tcv, o.term); const plannedCostRatio = dec(o.cost).dividedBy(o.tcv);
   const lowMargin = ai % 17 === 0; // a few contracts whose delivery cost overruns plan (low-margin recovery journey)
   for (let m = 0; m < 24; m++) {
     const month = addMonths(firstMonth, m);
     if (month < new Date(Date.UTC(a.start.getUTCFullYear(), a.start.getUTCMonth(), 1)) || month > a.end || month > TODAY) continue;
+    const k = (month.getUTCFullYear() - a.start.getUTCFullYear()) * 12 + month.getUTCMonth() - a.start.getUTCMonth();
+    if (k >= schedule.length) continue;
+    const monthly = schedule[k]; // amortised budget: the last month absorbs rounding, so scheduled billing never exceeds the contract
     const variance = dec((0.94 + rnd() * 0.08).toFixed(4));
     const revenue = round2(monthly.times(variance));
     const costRatio = lowMargin ? plannedCostRatio.times("1.12") : plannedCostRatio.times((0.97 + rnd() * 0.06).toFixed(4));

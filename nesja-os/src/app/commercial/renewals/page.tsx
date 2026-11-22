@@ -1,6 +1,7 @@
 import { asUser } from "@/lib/server/session";
 import { many } from "@/lib/server/db";
 import { paging, type ListParams } from "@/lib/server/list";
+import { ExportButton } from "@/components/ui/export-button";
 import { DataTable } from "@/components/ui/data-table";
 import { ListToolbar } from "@/components/ui/list-toolbar";
 import { Badge, PageHeader } from "@/components/ui/primitives";
@@ -16,7 +17,7 @@ export default async function Renewals({ searchParams }: { searchParams: Promise
     where r.tenant_id = $1 and ($2::int is null or (r.status in ('upcoming','in_progress') and r.due_date < current_date + $2)) and ($3::text is null or r.risk = $3)
     order by r.due_date limit $4 offset $5`, [s.org.id, win, sp.risk || null, pg.limit + 1, pg.offset]) }), "renewal.view");
   return (<>
-    <PageHeader title="Renewals" subtitle="Contract expiry, renewal risk and repricing." />
+    <PageHeader title="Renewals" subtitle="Contract expiry, renewal risk and repricing." actions={<ExportButton entity="renewals" />} />
     <ListToolbar page={pg.page} hasMore={rows.length > pg.limit} base={{ window: sp.window, risk: sp.risk }} filters={[{ name: "window", value: sp.window, options: [["90", "Due in 90 days"], ["180", "Due in 180 days"], ["365", "Due in 12 months"]] }, { name: "risk", value: sp.risk, options: [["high", "High risk"], ["medium", "Medium"], ["low", "Low"]] }]} />
     <DataTable rows={rows.slice(0, pg.limit)} href={(r) => `/commercial/agreements/${r.agreement_id}`} columns={[
       { key: "t", header: "Agreement", cell: (r) => r.title }, { key: "a", header: "Account", cell: (r) => r.account }, { key: "d", header: "Decision due", cell: (r) => date(r.due_date) }, { key: "e", header: "Expires", cell: (r) => date(r.end_date) },

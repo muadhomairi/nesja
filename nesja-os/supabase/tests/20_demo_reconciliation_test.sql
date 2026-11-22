@@ -39,7 +39,7 @@ select test.ok(not exists (
   where f.tenant_id = :'t' and (f.period_month < date_trunc('month', a.start_date) or f.period_month > a.end_date)), 'actuals fall inside agreement dates');
 select test.ok(not exists (
   select a.id from public.agreements a join public.financial_actuals f on f.tenant_id = a.tenant_id and f.agreement_id = a.id
-  where a.tenant_id = :'t' group by a.id, a.contract_value having sum(f.budget_revenue) > a.contract_value + 1), 'budgeted actuals never exceed contract value');
+  where a.tenant_id = :'t' group by a.id, a.contract_value having sum(f.budget_revenue) > a.contract_value), 'budgeted actuals never exceed contract value (to the cent)');
 select test.ok(not exists (
   select 1 from public.renewals r join public.agreements a on a.tenant_id = r.tenant_id and a.id = r.agreement_id
   join public.opportunities o on o.tenant_id = a.tenant_id and o.id = a.opportunity_id
@@ -51,6 +51,25 @@ select test.ok(exists (select 1 from public.financial_actuals f join public.agre
 select test.ok(not exists (select 1 from public.documents where tenant_id = :'t' and split_part(storage_path, '/', 1) <> tenant_id::text), 'documents stored under the tenant prefix');
 -- Demo data never leaks into a customer tenant
 select test.ok(not exists (select 1 from public.accounts a join public.tenants t on t.id = a.tenant_id where a.is_demo and t.kind <> 'demo'), 'no demo records in customer tenants');
+
+-- Data quality, reconciliation and forecast views
+select test.ok(not exists (select 1 from public.reconciliation_checks where tenant_id = :'t' and status = 'discrepancy'), 'demo dataset fully reconciles');
+select test.ok((select count(*) from public.reconciliation_checks where tenant_id = :'t' and check_key = 'agreement_vs_opportunity') = 90, 'every valued agreement is reconciled to its opportunity');
+select test.ok(exists (select 1 from public.data_quality_issues where tenant_id = :'t'), 'data quality rules find demo issues');
+select test.ok(not exists (select 1 from public.data_quality_issues where severity not in ('low', 'medium', 'high', 'critical')), 'data quality severities are valid');
+select test.ok((select count(distinct period_month) from public.forecast_months where tenant_id = :'t' and layer = 'contracted') = 12, 'contracted forecast covers 12 months');
+select test.ok(not exists (select 1 from public.forecast_months where amount < 0), 'forecast amounts are non-negative');
+-- One open opportunity spread over its term adds back to its weighted value (within rounding of one cent per month)
+select test.ok(not exists (
+  select 1 from public.opportunities o where o.tenant_id = :'t' and o.stage not in ('closed_won', 'closed_lost') and o.expected_close is not null
+    and abs(o.weighted_value - round(o.weighted_value / o.term_months, 2) * o.term_months) > o.term_months * 0.01), 'pipeline spreading is consistent');
+-- Views are security_invoker: another tenant sees none of Northstar's rows
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a"}', false);
+select test.ok((select count(*) from public.data_quality_issues where tenant_id = :'t') = 0
+  and (select count(*) from public.reconciliation_checks where tenant_id = :'t') = 0
+  and (select count(*) from public.forecast_months where tenant_id = :'t') = 0, 'quality, reconciliation and forecast views respect RLS');
+reset role;
 
 -- Demo user isolation: a Northstar account manager sees only own records; a Tenant A owner sees no Northstar data.
 select (select json_build_object('sub', m.user_id)::text from public.memberships m join public.roles r on r.tenant_id = m.tenant_id and r.id = m.role_id

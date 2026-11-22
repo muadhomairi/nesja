@@ -26,9 +26,13 @@ const NAV: { group: TKey; items: Item[] }[] = [
     { href: "/commercial/renewals", key: "nav.renewals", icon: "RefreshCcw", perm: "renewal.view" },
     { href: "/commercial/documents", key: "nav.documents", icon: "FolderOpen", perm: "document.view" } ] },
   { group: "group.insight", items: [
-    { href: "/commercial/performance", key: "nav.performance", icon: "ChartColumn", perm: "finance.view" } ] },
+    { href: "/commercial/performance", key: "nav.performance", icon: "ChartColumn", perm: "finance.view" },
+    { href: "/commercial/forecast", key: "nav.forecast", icon: "TrendingUp", perm: "report.view" },
+    { href: "/commercial/data-quality", key: "nav.quality", icon: "ShieldCheck", perm: "report.view" },
+    { href: "/commercial/assistant", key: "nav.assistant", icon: "Sparkles", perm: "ai.use" } ] },
   { group: "group.org", items: [
     { href: "/admin", key: "nav.admin", icon: "Settings2", perm: "admin.users" },
+    { href: "/admin/integrations", key: "nav.integrations", icon: "Plug", perm: "admin.org" },
     { href: "/launcher", key: "nav.launcher", icon: "LayoutGrid" } ] },
 ];
 
@@ -40,11 +44,7 @@ function Icon({ name }: { name: keyof typeof I }) {
 export async function AppShell({ session, children, unread = 0 }: { session: Session; children: ReactNode; unread?: number }) {
   const t = await getT();
   const demo = session.org?.kind === "demo";
-  return (
-    <div className="flex min-h-screen">
-      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-e border-line bg-surface lg:flex" aria-label="Main navigation">
-        <div className="px-4 py-4"><Link href="/launcher"><Wordmark product="Commercial" /></Link></div>
-        <nav className="flex-1 space-y-4 overflow-y-auto px-2 pb-4">
+  const navBody = (<>
           {NAV.map((g) => {
             const items = g.items.filter((i) => !i.perm || session.can(i.perm));
             if (!items.length) return null;
@@ -56,12 +56,21 @@ export async function AppShell({ session, children, unread = 0 }: { session: Ses
               </div>
             );
           })}
-        </nav>
+        </>);
+  return (
+    <div className="flex min-h-screen">
+      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-e border-line bg-surface lg:flex" aria-label="Main navigation">
+        <div className="px-4 py-4"><Link href="/launcher"><Wordmark product="Commercial" /></Link></div>
+        <nav className="flex-1 space-y-4 overflow-y-auto px-2 pb-4">{navBody}</nav>
         <p className="border-t border-line px-4 py-2 text-[10px] text-subtle">{RELEASE.product} {RELEASE.version}</p>
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
         {demo && <div className="bg-brand-500 px-4 py-1.5 text-center text-xs font-semibold text-on-brand">Demonstration environment · all companies, people and figures are fictional (USD)</div>}
         <header className="sticky top-0 z-10 flex items-center gap-2 border-b border-line bg-surface/90 px-4 py-2 backdrop-blur">
+          <details className="relative lg:hidden">
+            <summary className="list-none rounded-lg p-2 text-muted hover:bg-hover" aria-label="Open navigation"><I.Menu className="h-5 w-5" /></summary>
+            <nav className="absolute start-0 top-11 z-20 max-h-[80vh] w-64 space-y-4 overflow-y-auto rounded-xl border border-line bg-surface p-2 shadow-lg">{navBody}</nav>
+          </details>
           <Link href="/launcher" className="lg:hidden"><Wordmark /></Link>
           <form action="/commercial/search" className="hidden max-w-md flex-1 md:block">
             <label className="sr-only" htmlFor="q">Search</label>

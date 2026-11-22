@@ -106,6 +106,11 @@ try {
   ok("opportunity closed won after accepted quote + approval", await p.getByText("Closed won", { exact: true }).first().isVisible());
   await shot(p, "06-opportunity-won");
 
+  await p.goto(`${APP}/admin/integrations`); await shot(p, "06b-integrations");
+  ok("integrations: billing and AI are not configured", (await p.getByText("Not configured", { exact: true }).count()) >= 2);
+  const own = await p.request.get(`${APP}/api/export/opportunities`);
+  ok("owner exports only own tenant's opportunities", own.status() === 200 && (await own.text()).trim().split("\r\n").length === 2);
+
   // 7. Tenant isolation through the UI: Acme users cannot open a Northstar record
   const res = await p.goto(`${APP}/commercial/accounts/${"bd4f5e4c-0000-4000-8000-000000000000"}`);
   ok("unknown / foreign record id returns 404", res.status() === 404);
@@ -115,7 +120,7 @@ try {
   await d.goto(`${APP}/demo`); await shot(d, "07-demo-entry"); await d.click("button[type=submit]");
   await d.waitForURL(/demo\/journeys/); await shot(d, "08-demo-journeys");
   ok("demo session starts on the journeys page", (await d.locator("li.card").count()) === 6);
-  for (const path of ["/commercial", "/commercial/accounts", "/commercial/opportunities", "/commercial/quotes", "/commercial/tenders", "/commercial/agreements", "/commercial/renewals", "/commercial/approvals", "/commercial/performance", "/commercial/costing", "/commercial/documents", "/commercial/activities"]) {
+  for (const path of ["/commercial", "/commercial/accounts", "/commercial/opportunities", "/commercial/quotes", "/commercial/tenders", "/commercial/agreements", "/commercial/renewals", "/commercial/approvals", "/commercial/performance", "/commercial/costing", "/commercial/documents", "/commercial/activities", "/commercial/forecast", "/commercial/data-quality", "/commercial/assistant"]) {
     const r = await d.goto(`${APP}${path}`); ok(`demo ${path} renders`, r.status() === 200);
     await shot(d, `09-demo${path.replace(/\//g, "-")}`);
   }
@@ -127,6 +132,13 @@ try {
   await d.goto(`${APP}/commercial/performance`); await d.locator("#units a").first().click(); await d.waitForURL(/unit=/);
   ok("MIS drill-down by business unit", true);
   await d.goto(`${APP}/commercial`); await d.evaluate(() => document.documentElement.classList.add("dark")); await shot(d, "10-command-center-dark");
+  await d.goto(`${APP}/commercial/data-quality`);
+  ok("demo data fully reconciles (no discrepancies)", await d.getByText("No discrepancy checks.").isVisible());
+  await d.goto(`${APP}/commercial/assistant`);
+  ok("assistant says not configured and shows no generated output", await d.getByText("Not configured.").isVisible());
+  const ex = await d.request.get(`${APP}/api/export/opportunities`);
+  ok("CSV export of opportunities", ex.status() === 200 && (await ex.text()).split("\r\n").length > 250);
+  ok("CSV export of unknown entity is 404", (await d.request.get(`${APP}/api/export/secrets`)).status() === 404);
   await d.goto(`${APP}/admin`); ok("read-only demo role cannot open administration", d.url().includes("/forbidden"));
 } catch (e) {
   ok("journey completed without exceptions", false, e.message);

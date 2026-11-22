@@ -2,6 +2,7 @@ import Link from "next/link";
 import { asUser } from "@/lib/server/session";
 import { many } from "@/lib/server/db";
 import { Card, Kpi, PageHeader } from "@/components/ui/primitives";
+import { ExportButton } from "@/components/ui/export-button";
 import { DataTable } from "@/components/ui/data-table";
 import { BarChart } from "@/components/ui/charts";
 import { money, pct } from "@/lib/format";
@@ -33,7 +34,7 @@ export default async function Performance({ searchParams }: { searchParams: Prom
     { key: "v", header: "Variance", align: "end" as const, cell: (r: Agg) => { const v = new D(r.revenue).minus(r.budget); return <span className={v.isNegative() ? "text-bad" : "text-ok"}>{money(v.toFixed(2), d.cur)}</span>; } },
     { key: "g", header: "GM %", align: "end" as const, cell: (r: Agg) => pct(gm({ revenue: new D(r.revenue), cost: new D(r.cost) })) }];
   return (<>
-    <PageHeader title="MIS & performance" subtitle={<>Monthly actuals, YTD and budget variance. Filters: {month ? sp.month : "all months"}{sp.unit ? " · unit" : ""}{sp.account ? " · account" : ""}{sp.agreement ? " · agreement" : ""} {base.toString() && <Link href="/commercial/performance" className="text-link">clear</Link>}</>} />
+    <PageHeader title="MIS & performance" actions={<ExportButton entity="actuals" />} subtitle={<>Monthly actuals, YTD and budget variance. Filters: {month ? sp.month : "all months"}{sp.unit ? " · unit" : ""}{sp.account ? " · account" : ""}{sp.agreement ? " · agreement" : ""} {base.toString() && <Link href="/commercial/performance" className="text-link">clear</Link>}</>} />
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       <Kpi label="Revenue YTD" value={money(ytd.revenue.toFixed(2), d.cur, true)} href="#months" status={ytd.revenue.gte(ytd.budget) ? "on_target" : ytd.revenue.gte(ytd.budget.times(0.95)) ? "at_risk" : "off_target"} sub={`Budget ${money(ytd.budget.toFixed(2), d.cur, true)}`} />
       <Kpi label="Variance YTD" value={money(ytd.revenue.minus(ytd.budget).toFixed(2), d.cur, true)} href="#accounts" />

@@ -1,6 +1,7 @@
 import { asUser } from "@/lib/server/session";
 import { many } from "@/lib/server/db";
 import { like, paging, type ListParams } from "@/lib/server/list";
+import { ExportButton } from "@/components/ui/export-button";
 import { DataTable } from "@/components/ui/data-table";
 import { ListToolbar } from "@/components/ui/list-toolbar";
 import { Badge, PageHeader } from "@/components/ui/primitives";
@@ -16,7 +17,7 @@ export default async function Agreements({ searchParams }: { searchParams: Promi
       and ($4::public.agreement_status is null or g.status = $4) and ($5::uuid is null or g.account_id = $5)
     order by g.end_date nulls last limit $6 offset $7`, [s.org.id, like(sp.q), TY.includes(sp.type ?? "") ? sp.type : null, ST.includes(sp.status ?? "") ? sp.status : null, /^[0-9a-f-]{36}$/.test(sp.account ?? "") ? sp.account : null, pg.limit + 1, pg.offset]) }), "agreement.view");
   return (<>
-    <PageHeader title="Agreements" subtitle="NDA, MOU, MSA, SOW and order forms with schedules, values and expiry." />
+    <PageHeader title="Agreements" subtitle="NDA, MOU, MSA, SOW and order forms with schedules, values and expiry." actions={<ExportButton entity="agreements" />} />
     <ListToolbar q={sp.q} page={pg.page} hasMore={rows.length > pg.limit} base={{ q: sp.q, type: sp.type, status: sp.status, account: sp.account }} filters={[{ name: "type", value: sp.type, options: TY.map((x) => [x, x.toUpperCase().replace("_", " ")]) }, { name: "status", value: sp.status, options: ST.map((x) => [x, label(x)]) }]} />
     <DataTable rows={rows.slice(0, pg.limit)} href={(r) => `/commercial/agreements/${r.id}`} columns={[
       { key: "t", header: "Agreement", cell: (r) => r.title }, { key: "ty", header: "Type", cell: (r) => r.type.toUpperCase().replace("_", " ") }, { key: "a", header: "Account", cell: (r) => r.account },

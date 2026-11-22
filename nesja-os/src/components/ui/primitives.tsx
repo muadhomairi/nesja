@@ -31,7 +31,7 @@ export function ButtonLink({ href, children, variant = "primary", className }: {
 
 export function Card({ title, action, children, className }: { title?: ReactNode; action?: ReactNode; children: ReactNode; className?: string }) {
   return (
-    <section className={cx("card p-4", className)}>
+    <section className={cx("card min-w-0 p-4", className)}>
       {(title || action) && <div className="mb-3 flex items-center gap-2"><h2 className="text-sm font-semibold">{title}</h2><div className="ms-auto">{action}</div></div>}
       {children}
     </section>

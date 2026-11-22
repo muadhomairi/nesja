@@ -1,6 +1,7 @@
 import { asUser } from "@/lib/server/session";
 import { many } from "@/lib/server/db";
 import { like, paging, type ListParams } from "@/lib/server/list";
+import { ExportButton } from "@/components/ui/export-button";
 import { DataTable } from "@/components/ui/data-table";
 import { ListToolbar } from "@/components/ui/list-toolbar";
 import { Badge, ButtonLink, PageHeader } from "@/components/ui/primitives";
@@ -22,7 +23,7 @@ export default async function Opportunities({ searchParams }: { searchParams: Pr
     order by o.expected_close limit $7 offset $8`, [s.org.id, like(sp.q), stage, sp.status || null, /^[0-9a-f-]{36}$/.test(sp.account ?? "") ? sp.account : null, sp.period || null, pg.limit + 1, pg.offset]) }), "opportunity.view");
   const shown = rows.slice(0, pg.limit);
   return (<>
-    <PageHeader title="Opportunities" subtitle="Pipeline with TCV, weighted value and margin computed by the database." actions={canCreate && <ButtonLink href="/commercial/opportunities/new">New opportunity</ButtonLink>} />
+    <PageHeader title="Opportunities" subtitle="Pipeline with TCV, weighted value and margin computed by the database." actions={<><ExportButton entity="opportunities" />{canCreate && <ButtonLink href="/commercial/opportunities/new">New opportunity</ButtonLink>}</>} />
     <ListToolbar q={sp.q} page={pg.page} hasMore={rows.length > pg.limit} base={{ q: sp.q, stage: sp.stage, status: sp.status, account: sp.account, period: sp.period }} filters={[{ name: "stage", value: sp.stage, options: STAGES.map((x) => [x, label(x)]) }]} />
     <DataTable rows={shown} href={(r) => `/commercial/opportunities/${r.id}`} empty="No opportunities match" columns={[
       { key: "n", header: "Opportunity", cell: (r) => r.name }, { key: "a", header: "Account", cell: (r) => r.account },

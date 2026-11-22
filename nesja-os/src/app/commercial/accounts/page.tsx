@@ -1,6 +1,7 @@
 import { asUser } from "@/lib/server/session";
 import { many } from "@/lib/server/db";
 import { like, paging, type ListParams } from "@/lib/server/list";
+import { ExportButton } from "@/components/ui/export-button";
 import { DataTable } from "@/components/ui/data-table";
 import { ListToolbar } from "@/components/ui/list-toolbar";
 import { Badge, PageHeader } from "@/components/ui/primitives";
@@ -18,7 +19,7 @@ export default async function Accounts({ searchParams }: { searchParams: Promise
     where a.tenant_id = $1 and a.archived_at is null and ($2::text is null or a.name ilike $2 or a.number ilike $2) and ($3::text is null or a.segment = $3)
     order by a.name limit $4 offset $5`, [s.org.id, like(sp.q), sp.segment || null, pg.limit + 1, pg.offset]) }), "account.view");
   return (<>
-    <PageHeader title="Accounts" subtitle="Customers and prospects with their open pipeline and active contract value." />
+    <PageHeader title="Accounts" subtitle="Customers and prospects with their open pipeline and active contract value." actions={<ExportButton entity="accounts" />} />
     <ListToolbar q={sp.q} page={pg.page} hasMore={rows.length > pg.limit} base={{ q: sp.q, segment: sp.segment }} filters={[{ name: "segment", value: sp.segment, options: [["enterprise", "Enterprise"], ["mid_market", "Mid-market"], ["smb", "SMB"], ["public_sector", "Public sector"]] }]} />
     <DataTable rows={rows.slice(0, pg.limit)} href={(r) => `/commercial/accounts/${r.id}`} empty="No accounts match" columns={[
       { key: "name", header: "Account", cell: (r) => r.name }, { key: "number", header: "No.", cell: (r) => r.number },
