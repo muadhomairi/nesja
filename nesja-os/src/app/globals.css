@@ -1,0 +1,7 @@
+@import "tailwindcss";
+@import "../design-system/tokens.css";
+@source "../";
+
+body { min-height: 100vh; }
+.card { border: 1px solid var(--line); background: var(--surface); border-radius: 12px; }
+.money { font-variant-numeric: tabular-nums; white-space: nowrap; }

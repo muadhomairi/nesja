@@ -47,3 +47,7 @@ begin
 end $$;
 revoke all on function public.convert_demo_to_live(uuid, text, text) from public, anon;
 grant execute on function public.convert_demo_to_live(uuid, text, text) to authenticated;
+
+-- Rate limits (login, sign-up, demo sessions). Server-only table; keys are hashed.
+create table private.rate_limits (key text not null, window_start timestamptz not null, hits int not null, primary key (key, window_start));
+create index rate_limits_gc_idx on private.rate_limits(window_start);
