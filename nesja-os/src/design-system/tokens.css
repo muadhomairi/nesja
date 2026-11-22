@@ -1,0 +1,161 @@
+/*
+ * NESJA Design System v1.0.0 (shared by Commercial, Engage and Deliver).
+ * Token source: NESJA Engage V1.1.6, apps/web/app/globals.css (feature/nesja-engage-v1.1.6 @ 225b00b).
+ * Change tokens here and in Engage together; bump DS_VERSION in src/design-system/version.ts.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * NESJA Engage design tokens (V1.0.2).
+ * Source of truth: NESJA brand guidelines —
+ *   Midnight Core #0C1324 · Neural Teal #12C6C2 · Signal Blue #4B6BFF
+ *   Cloud White #F5F7FB · Slate Graphite #5B6678 · Soft Silver #C9D1DC
+ * Components use SEMANTIC tokens (bg, surface, fg, muted, line, focus, selected …), never raw hex.
+ * V1.1.4 brand: Sky #57C2E9 (primary accent scale), Pewter #97999A (decorative neutral, never body text on white: 2.9:1),
+ *   Charcoal #222223 (foreground ink and text on Sky: 7.8:1).
+ * Brand scales exist for intentional accents only; status colours are separate and always paired with text/icons.
+ */
+@theme {
+  /* V1.1.4 brand Sky #57C2E9 (primary accent). 500 = brand; 700+ are the text-safe steps on light surfaces (700 = 4.7:1 on white). */
+  --color-brand-50: #f2fafd;
+  --color-brand-100: #e4f5fb;
+  --color-brand-200: #c6eaf8;
+  --color-brand-300: #9adaf2;
+  --color-brand-400: #75cded;
+  --color-brand-500: #57c2e9;
+  --color-brand-600: #48a0c2;
+  --color-brand-700: #377b96;
+  --color-brand-800: #2d667d;
+  --color-brand-900: #245367;
+  --color-brand-950: #193c4b;
+
+  /* Signal Blue (secondary accent: links, selection, information, data emphasis). */
+  --color-accent-50: #eef1ff;
+  --color-accent-100: #dde3ff;
+  --color-accent-200: #bcc8ff;
+  --color-accent-300: #93a6ff;
+  --color-accent-400: #6e87ff;
+  --color-accent-500: #4b6bff;
+  --color-accent-600: #3550e6;
+  --color-accent-700: #283dbf;
+  --color-accent-800: #22349a;
+  --color-accent-900: #1f2f7a;
+
+  /* Brand foundations */
+  --color-midnight: #0c1324;
+  --color-cloud: #f5f7fb;
+  --color-slate: #5b6678;
+  --color-silver: #c9d1dc;
+  /* Legacy aliases (kept so existing classes resolve to NESJA colours, not Infoline's). */
+  --color-ink: #0c1324;
+  --color-steel: #5b6678;
+
+  /* Semantic surfaces & text (switch with theme) */
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-elevated: var(--elevated);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-link: var(--link);
+  --color-focus: var(--focus);
+  --color-selected: var(--selected);
+  --color-hover: var(--hover);
+  --color-disabled: var(--disabled);
+  --color-on-brand: #222223;
+  --color-sky: #57c2e9;
+  --color-pewter: #97999a;
+  --color-charcoal: #222223;
+
+  /* Functional status (never brand colours; always paired with a label or icon) */
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+  --color-bad: var(--bad);
+  --color-info: var(--info);
+
+  --font-sans: "Inter Variable", Inter, "IBM Plex Sans Arabic", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Arabic", "Geeza Pro", Tahoma, sans-serif;
+  --font-display: "Sora Variable", Sora, "IBM Plex Sans Arabic", "Inter Variable", -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --radius-xl: 12px;
+  --shadow-elevated: 0 1px 2px rgb(12 19 36 / 0.06), 0 8px 24px rgb(12 19 36 / 0.08);
+}
+
+:root {
+  /* Light — Cloud White foundation, comfortable for long shifts (no pure-white page background). */
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --surface-2: #eef1f6;
+  --surface-3: #e5e9f0;
+  --elevated: #ffffff;
+  --line: #dde3eb;
+  --line-strong: #c9d1dc;
+  --fg: #222223;
+  --muted: #5b6678;      /* 5.9:1 on white */
+  --subtle: #6b7588;     /* 4.6:1 on white — tertiary text */
+  --link: #283dbf;
+  --focus: #4b6bff;
+  --selected: rgb(18 198 194 / 0.14);
+  --hover: #eef1f6;
+  --disabled: #c9d1dc;
+  --ok: #12702f;     /* AA on its own 12% tint */
+  --warn: #8f4e00;   /* AA on its own 12% tint */
+  --bad: #c42b2b;
+  --info: #3550e6;
+  --grid: #e5e9f0;
+  --axis: #5b6678;
+  --series-1: #3f5ef0; --series-2: #0b9c98; --series-3: #d9731f; --series-4: #7c5ce0;
+  --series-5: #d2487a; --series-6: #5b6678; --series-7: #b98900; --series-8: #2c8dd6;
+  /* V1.1.6 evidence semantics: green verified positive, red verified failure, amber risk/needs review,
+     purple AI/lexicon interpretation, blue operational fact, gray unknown. Always paired with a text label. */
+  --ev-positive: #12702f; --ev-failure: #c42b2b; --ev-risk: #a35a00; --ev-ai: #6b4fd8; --ev-ops: #2c6fd6; --ev-unknown: #8a94a6;
+  --ev-agent: #3f5ef0; --ev-customer: #0b9c98;
+  color-scheme: light;
+}
+.dark {
+  /* Dark — Midnight Core foundation */
+  --bg: #0c1324;
+  --surface: #111a2e;
+  --surface-2: #18233b;
+  --surface-3: #1f2b46;
+  --elevated: #16203a;
+  --line: #243150;
+  --line-strong: #33415f;
+  --fg: #f5f7fb;
+  --muted: #a9b3c4;
+  --subtle: #8b96aa;
+  --link: #93a6ff;
+  --focus: #6e87ff;
+  --selected: rgb(18 198 194 / 0.16);
+  --hover: #18233b;
+  --disabled: #33415f;
+  --ok: #3ccf7a;
+  --warn: #f2a93b;
+  --bad: #ff6b6b;
+  --info: #93a6ff;
+  --grid: #243150;
+  --axis: #a9b3c4;
+  --series-1: #6e87ff; --series-2: #2bd0cc; --series-3: #f0954a; --series-4: #a08cf5;
+  --series-5: #ec6e9c; --series-6: #a9b3c4; --series-7: #e0b83a; --series-8: #5cb2f0;
+  --ev-positive: #3ccf7a; --ev-failure: #ff6b6b; --ev-risk: #f2a93b; --ev-ai: #a08cf5; --ev-ops: #5cb2f0; --ev-unknown: #8b96aa;
+  --ev-agent: #6e87ff; --ev-customer: #2bd0cc;
+  color-scheme: dark;
+}
+
+html, body { background: var(--bg); color: var(--fg); }
+body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; font-feature-settings: "cv11", "ss01"; }
+:lang(ar) body, [dir="rtl"] body { font-family: "IBM Plex Sans Arabic", var(--font-sans); }
+.font-display { font-family: var(--font-display); letter-spacing: -0.01em; }
+h1, .page-title { font-family: var(--font-display); }
+.tabular { font-variant-numeric: tabular-nums; }
+::selection { background: rgb(18 198 194 / 0.3); }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+* { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+
+/* Brand gradient (Neural Teal → Signal Blue) — used sparingly: logo, primary progress, the active nav indicator. */
+.brand-gradient { background-image: linear-gradient(135deg, #12c6c2 0%, #4b6bff 100%); }
+.brand-gradient-text { background-image: linear-gradient(135deg, #12c6c2 0%, #4b6bff 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }

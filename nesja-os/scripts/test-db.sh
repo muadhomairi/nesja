@@ -12,4 +12,8 @@ $RUNAS "$PGBIN/pg_ctl" -D "$WORK/data" -o "-p $PORT -k $WORK -c listen_addresses
 PSQL=(psql -h "$WORK" -p "$PORT" -U postgres -d postgres -v ON_ERROR_STOP=1 -q)
 "${PSQL[@]}" -f "$ROOT/supabase/tests/00_local_supabase_stubs.sql"
 for m in "$ROOT"/supabase/migrations/*.sql; do echo "migrate $(basename "$m")"; "${PSQL[@]}" -f "$m"; done
-for t in "$ROOT"/supabase/tests/[1-9]*_test.sql; do echo "test $(basename "$t")"; "${PSQL[@]}" -f "$t" 2>&1; done
+echo "generate demo dataset"; (cd "$ROOT" && npx tsx scripts/generate-demo.ts --out "$WORK/northstar.sql" >/dev/null)
+for t in "$ROOT"/supabase/tests/[1-9]*_test.sql; do
+  case "$(basename "$t")" in 2*) echo "load demo dataset"; "${PSQL[@]}" -f "$WORK/northstar.sql" >/dev/null;; esac
+  echo "test $(basename "$t")"; "${PSQL[@]}" -f "$t" 2>&1 | grep -E "ok -|FAIL|ERROR|PASSED" | sed -E 's/^psql:[^:]+:[0-9]+: //'
+done
